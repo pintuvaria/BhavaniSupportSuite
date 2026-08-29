@@ -14,7 +14,8 @@
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="CanResizeWithGrip"
-        Icon="Resources/AppIcon.ico">
+        Icon="Resources/AppIcon.ico"
+        Closing="Window_Closing">
 
     <Window.DataContext>
         <vm:MainViewModel />
@@ -27,7 +28,7 @@
     <Border Background="{StaticResource PrimaryBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="40" />
+                <RowDefinition Height="48" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -38,16 +39,74 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" Margin="12,0" VerticalAlignment="Center">
-                    <Image Source="Resources/AppIcon.ico" Width="20" Height="20" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
-                    <TextBlock Text="  Bhavani Support Suite Pro" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <TextBlock Text="  |  Bhavani Technology" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                <!-- Left: Icon + Title -->
+                <StackPanel Orientation="Horizontal" Margin="16,0" VerticalAlignment="Center">
+                    <Image Source="Resources/AppIcon.ico" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                    <TextBlock Text="  Bhavani Support Suite Pro" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    <TextBlock Text="  |  Bhavani Technology" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
-                    <Button Content="&#xE949;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource TitleBarButtonStyle}" Width="46" Height="32" Padding="0" Click="MinimizeButton_Click" FontSize="12" HorizontalContentAlignment="Center" />
-                    <Button Content="&#xE739;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource TitleBarButtonStyle}" Width="46" Height="32" Padding="0" Click="MaximizeButton_Click" FontSize="12" HorizontalContentAlignment="Center" />
-                    <Button Content="&#xE106;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource CloseButtonStyle}" Width="46" Height="32" Padding="0" Click="CloseButton_Click" FontSize="12" HorizontalContentAlignment="Center" />
+                <!-- Right: Window Control Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <!-- Minimize Button -->
+                    <Button x:Name="MinimizeBtn" Width="44" Height="32" Margin="2,0" 
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            Click="MinimizeButton_Click" ToolTip="Minimize">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
+                                    <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="14" 
+                                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="border" Property="Background" Value="#33FFFFFF"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Maximize Button -->
+                    <Button x:Name="MaximizeBtn" Width="44" Height="32" Margin="2,0"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            Click="MaximizeButton_Click" ToolTip="Maximize">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
+                                    <TextBlock Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="border" Property="Background" Value="#33FFFFFF"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Close Button -->
+                    <Button x:Name="CloseBtn" Width="44" Height="32" Margin="2,0"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            Click="CloseButton_Click" ToolTip="Close">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
+                                    <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="border" Property="Background" Value="{StaticResource DangerBrush}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
                 </StackPanel>
             </Grid>
 
@@ -100,100 +159,104 @@
                 </Border>
 
                 <!-- Content Area -->
-                <Border Grid.Column="1" Background="{StaticResource PrimaryBrush}" Padding="0">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                <Grid Grid.Column="1">
+                    <!-- Welcome Screen (Overlay) -->
+                    <views:WelcomeView x:Name="WelcomeScreen" 
+                                        Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-                        <!-- Header (Hidden during Welcome/Goodbye) -->
-                        <Border Grid.Row="0" Padding="28,20,28,16" Background="{StaticResource PrimaryBrush}" 
-                                Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                    <!-- Goodbye Screen (Overlay) -->
+                    <views:GoodbyeView x:Name="GoodbyeScreen" 
+                                       Visibility="{Binding IsGoodbyeActive, Converter={StaticResource BoolToVisibilityConverter}}"
+                                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-                                <StackPanel>
-                                    <TextBlock Text="{Binding CurrentView.Title}" Style="{StaticResource HeaderText}" />
-                                    <TextBlock Style="{StaticResource SubHeaderText}" Margin="0,4,0,0">
-                                        <Run Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" />
-                                        <Run Text=" | Prepared by Dharmesh Varia" />
+                    <!-- Main Application Content -->
+                    <Border Background="{StaticResource PrimaryBrush}" Padding="0"
+                            Visibility="{Binding IsWelcomeActive, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Header -->
+                            <Border Grid.Row="0" Padding="28,20,28,16" Background="{StaticResource PrimaryBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding CurrentView.Title}" Style="{StaticResource HeaderText}" />
+                                        <TextBlock Style="{StaticResource SubHeaderText}" Margin="0,4,0,0">
+                                            <Run Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" />
+                                            <Run Text=" | Prepared by Dharmesh Varia" />
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="CPU " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="MEM " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="TEMP " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                            <TextBlock Text="{Binding CurrentTime}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center" />
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- View Content -->
+                            <Border Grid.Row="1" Padding="28,0,28,12">
+                                <ContentControl Content="{Binding CurrentView}">
+                                    <ContentControl.Resources>
+                                        <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:HardwareViewModel}"><views:HardwareView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:StagingViewModel}"><views:StagingView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:NetworkViewModel}"><views:NetworkView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:SecurityViewModel}"><views:SecurityView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:VaultViewModel}"><views:VaultView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:StorageViewModel}"><views:StorageView /></DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:ReportsViewModel}"><views:ReportsView /></DataTemplate>
+                                    </ContentControl.Resources>
+                                </ContentControl>
+                            </Border>
+
+                            <!-- Status Bar -->
+                            <Border Grid.Row="2" Background="{StaticResource SidebarBrush}" Padding="16,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Background="{StaticResource AccentBrush}" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding SystemStatus}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center">
+                                        <Run Text="v1.0.0" /><Run Text=" | " /><Run Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" />
                                     </TextBlock>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="CPU " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="MEM " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="TEMP " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
-                                        <TextBlock Text="{Binding CurrentTime}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center" />
-                                    </Border>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Welcome Screen -->
-                        <views:WelcomeView Grid.Row="1" 
-                                            Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                        <!-- Goodbye Screen -->
-                        <views:GoodbyeView Grid.Row="1" 
-                                           Visibility="{Binding IsGoodbyeActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                        <!-- View Content (Hidden during Welcome/Goodbye) -->
-                        <Border Grid.Row="1" Padding="28,0,28,12" 
-                                Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
-                            <ContentControl Content="{Binding CurrentView}">
-                                <ContentControl.Resources>
-                                    <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:HardwareViewModel}"><views:HardwareView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:StagingViewModel}"><views:StagingView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:NetworkViewModel}"><views:NetworkView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:SecurityViewModel}"><views:SecurityView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:VaultViewModel}"><views:VaultView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:StorageViewModel}"><views:StorageView /></DataTemplate>
-                                    <DataTemplate DataType="{x:Type vm:ReportsViewModel}"><views:ReportsView /></DataTemplate>
-                                </ContentControl.Resources>
-                            </ContentControl>
-                        </Border>
-
-                        <!-- Status Bar -->
-                        <Border Grid.Row="2" Background="{StaticResource SidebarBrush}" Padding="16,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Background="{StaticResource AccentBrush}" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding SystemStatus}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center">
-                                    <Run Text="v1.0.0" /><Run Text=" | " /><Run Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" />
-                                </TextBlock>
-                            </Grid>
-                        </Border>
-                    </Grid>
-                </Border>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
             </Grid>
         </Grid>
     </Border>

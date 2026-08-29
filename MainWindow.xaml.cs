@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using BhavaniSupportSuite.ViewModels;
@@ -7,6 +8,7 @@ namespace BhavaniSupportSuite;
 public partial class MainWindow : Window
 {
     private MainViewModel? _viewModel;
+    private bool _isClosing;
 
     public MainWindow()
     {
@@ -45,6 +47,20 @@ public partial class MainWindow : Window
 
     private async void CloseButton_Click(object sender, RoutedEventArgs e)
     {
+        if (_isClosing) return;
+        _isClosing = true;
+
+        _viewModel?.ShowGoodbye();
+        await Task.Delay(2000);
+        Application.Current.Shutdown();
+    }
+
+    private async void Window_Closing(object? sender, CancelEventArgs e)
+    {
+        if (_isClosing) return;
+        e.Cancel = true;
+        _isClosing = true;
+
         _viewModel?.ShowGoodbye();
         await Task.Delay(2000);
         Application.Current.Shutdown();

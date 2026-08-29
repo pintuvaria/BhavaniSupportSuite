@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             Width="800" Height="500">
+             d:DesignHeight="500" d:DesignWidth="800">
     
     <Grid Background="{StaticResource PrimaryBrush}">
         <Grid.RowDefinitions>
@@ -25,15 +25,17 @@
             <!-- Logo -->
             <Image Grid.Row="0" Source="Resources/AppIcon.ico" Width="100" Height="100" 
                    RenderOptions.BitmapScalingMode="HighQuality" 
-                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,80,0,20" Opacity="0.8"/>
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,100,0,20" Opacity="0.8"/>
 
             <!-- Thank You -->
             <TextBlock Grid.Row="1" Text="Thank You" 
-                       Style="{StaticResource WelcomeTitle}" Margin="0,20,0,10"/>
+                       Foreground="{StaticResource TextPrimaryBrush}" FontSize="42" FontWeight="Bold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,10"/>
 
             <!-- Goodbye Message -->
             <TextBlock Grid.Row="2" Text="Shutting down Bhavani Support Suite Pro" 
-                       Style="{StaticResource WelcomeSubtitle}" FontSize="16" Margin="0,0,0,20"/>
+                       Foreground="{StaticResource AccentBrush}" FontSize="18"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,20"/>
 
             <!-- Session Info -->
             <Border Grid.Row="3" Background="{StaticResource CardBrush}" CornerRadius="12" 
@@ -41,13 +43,14 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Session ended" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
                     <TextBlock Text=" | " Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding CurrentTime, StringFormat='{}{0:hh\\:mm\\:ss tt}'}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="SessionTimeText" Text="--:--:--" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
             <!-- Developer Credit -->
             <TextBlock Grid.Row="4" Text="Developed by Dharmesh Varia | Bhavani Technology" 
-                       Style="{StaticResource WelcomeText}" FontSize="12" Margin="0,20,0,0"/>
+                       Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0"/>
         </Grid>
 
         <!-- Status Bar -->
