@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using BhavaniSupportSuite.ViewModels;
 
 namespace BhavaniSupportSuite;
@@ -16,9 +17,31 @@ public partial class MainWindow : Window
         Loaded += MainWindow_Loaded;
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         _viewModel = DataContext as MainViewModel;
+
+        // Show Welcome screen for 3 seconds, then switch to Main
+        await Task.Delay(3000);
+        ShowMainContent();
+    }
+
+    private void ShowMainContent()
+    {
+        WelcomePanel.Visibility = Visibility.Collapsed;
+        MainPanel.Visibility = Visibility.Visible;
+        GoodbyePanel.Visibility = Visibility.Collapsed;
+    }
+
+    private async void ShowGoodbyeScreen()
+    {
+        GoodbyeTime.Text = DateTime.Now.ToString("hh:mm:ss tt");
+        WelcomePanel.Visibility = Visibility.Collapsed;
+        MainPanel.Visibility = Visibility.Collapsed;
+        GoodbyePanel.Visibility = Visibility.Visible;
+
+        await Task.Delay(2000);
+        Application.Current.Shutdown();
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -45,24 +68,23 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
     }
 
-    private async void CloseButton_Click(object sender, RoutedEventArgs e)
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         if (_isClosing) return;
         _isClosing = true;
-
-        _viewModel?.ShowGoodbye();
-        await Task.Delay(2000);
-        Application.Current.Shutdown();
+        ShowGoodbyeScreen();
     }
 
-    private async void Window_Closing(object? sender, CancelEventArgs e)
+    private void Window_Closing(object? sender, CancelEventArgs e)
     {
-        if (_isClosing) return;
+        if (_isClosing)
+        {
+            e.Cancel = false;
+            return;
+        }
+
         e.Cancel = true;
         _isClosing = true;
-
-        _viewModel?.ShowGoodbye();
-        await Task.Delay(2000);
-        Application.Current.Shutdown();
+        ShowGoodbyeScreen();
     }
 }

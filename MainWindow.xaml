@@ -25,15 +25,16 @@
         <WindowChrome CaptionHeight="0" GlassFrameThickness="0" ResizeBorderThickness="8" CornerRadius="0" />
     </WindowChrome.WindowChrome>
 
-    <Border Background="{StaticResource PrimaryBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10">
+    <!-- Main Application Window -->
+    <Border Background="#181824" BorderBrush="#2A2A3C" BorderThickness="1" CornerRadius="10">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="48" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Title Bar -->
-            <Grid Grid.Row="0" Background="{StaticResource SidebarBrush}" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <!-- ========== TITLE BAR ========== -->
+            <Grid Grid.Row="0" Background="#12121C" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -41,66 +42,63 @@
 
                 <!-- Left: Icon + Title -->
                 <StackPanel Orientation="Horizontal" Margin="16,0" VerticalAlignment="Center">
-                    <Image Source="Resources/AppIcon.ico" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
-                    <TextBlock Text="  Bhavani Support Suite Pro" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                    <TextBlock Text="  |  Bhavani Technology" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+                    <Image Source="Resources/AppIcon.ico" Width="24" Height="24" VerticalAlignment="Center" />
+                    <TextBlock Text="  Bhavani Support Suite Pro" Foreground="#E0E0E0" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    <TextBlock Text="  |  Bhavani Technology" Foreground="#888888" FontSize="12" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- Right: Window Control Buttons -->
+                <!-- Right: Window Buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
-                    <!-- Minimize Button -->
-                    <Button x:Name="MinimizeBtn" Width="44" Height="32" Margin="2,0" 
-                            Background="Transparent" BorderThickness="0" Cursor="Hand"
-                            Click="MinimizeButton_Click" ToolTip="Minimize">
+                    <!-- MINIMIZE -->
+                    <Button Width="44" Height="32" Margin="2,0" Background="Transparent" BorderThickness="0" 
+                            Cursor="Hand" Click="MinimizeButton_Click" ToolTip="Minimize">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
-                                    <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="14" 
-                                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Border x:Name="bg" Background="Transparent" CornerRadius="6">
+                                    <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#888888" 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="border" Property="Background" Value="#33FFFFFF"/>
-                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter TargetName="bg" Property="Background" Value="#33FFFFFF"/>
+                                        <Setter Property="Foreground" Value="#E0E0E0"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
 
-                    <!-- Maximize Button -->
-                    <Button x:Name="MaximizeBtn" Width="44" Height="32" Margin="2,0"
-                            Background="Transparent" BorderThickness="0" Cursor="Hand"
-                            Click="MaximizeButton_Click" ToolTip="Maximize">
+                    <!-- MAXIMIZE -->
+                    <Button Width="44" Height="32" Margin="2,0" Background="Transparent" BorderThickness="0"
+                            Cursor="Hand" Click="MaximizeButton_Click" ToolTip="Maximize">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
-                                    <TextBlock Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="14"
-                                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Border x:Name="bg" Background="Transparent" CornerRadius="6">
+                                    <TextBlock Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#888888"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="border" Property="Background" Value="#33FFFFFF"/>
-                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter TargetName="bg" Property="Background" Value="#33FFFFFF"/>
+                                        <Setter Property="Foreground" Value="#E0E0E0"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
 
-                    <!-- Close Button -->
-                    <Button x:Name="CloseBtn" Width="44" Height="32" Margin="2,0"
-                            Background="Transparent" BorderThickness="0" Cursor="Hand"
-                            Click="CloseButton_Click" ToolTip="Close">
+                    <!-- CLOSE -->
+                    <Button Width="44" Height="32" Margin="2,0" Background="Transparent" BorderThickness="0"
+                            Cursor="Hand" Click="CloseButton_Click" ToolTip="Close">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6">
-                                    <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="14"
-                                               Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Border x:Name="bg" Background="Transparent" CornerRadius="6">
+                                    <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="14" Foreground="#888888"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="border" Property="Background" Value="{StaticResource DangerBrush}"/>
+                                        <Setter TargetName="bg" Property="Background" Value="#FF4757"/>
                                         <Setter Property="Foreground" Value="White"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -110,70 +108,123 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Main Content -->
+            <!-- ========== CONTENT AREA ========== -->
             <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Sidebar -->
-                <Border x:Name="SidebarBorder" Grid.Column="0" Background="{StaticResource SidebarBrush}"
-                        Width="{Binding IsSidebarExpanded, Converter={x:Static vm:MainViewModel.SidebarWidthConverter}}"
-                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+                <!-- WELCOME SCREEN (shows first) -->
+                <Border x:Name="WelcomePanel" Background="#181824" Visibility="Visible">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
-                            <ItemsControl ItemsSource="{Binding NavItems}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding ViewName}"
-                                                Style="{StaticResource SidebarButtonStyle}"
-                                                ToolTip="{Binding Label}">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe MDL2 Assets" FontSize="16" Width="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding Label}" Grid.Column="1" FontSize="13" FontWeight="Medium" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-
-                        <Button Grid.Row="1" Command="{Binding ToggleSidebarCommand}" Style="{StaticResource SidebarButtonStyle}" HorizontalContentAlignment="Center" Height="48" Margin="8,8">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="Resources/AppIcon.ico" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding IsSidebarExpanded, Converter={x:Static vm:MainViewModel.SidebarToggleConverter}}" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" />
+                        
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Image Source="Resources/AppIcon.ico" Width="120" Height="120" Margin="0,0,0,24" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Bhavani Support Suite Pro" Foreground="#E0E0E0" FontSize="42" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="Enterprise System Diagnostics &amp; Management" Foreground="#00ADB5" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <TextBlock Text="Version 1.0.0 | .NET 8 | WPF" Foreground="#888888" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,24"/>
+                            <Border Background="#222232" CornerRadius="12" Padding="32,16" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Developer: " Foreground="#888888" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Dharmesh Varia" Foreground="#00ADB5" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <TextBlock Text="  |  " Foreground="#888888" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Bhavani Technology" Foreground="#00ADB5" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        
+                        <!-- Welcome Status Bar -->
+                        <Border Grid.Row="1" Background="#12121C" Padding="20,12">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Border Background="#2ED573" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="System Ready - Loading modules..." Foreground="#888888" FontSize="12" VerticalAlignment="Center"/>
                             </StackPanel>
-                        </Button>
+                        </Border>
                     </Grid>
                 </Border>
 
-                <!-- Content Area -->
-                <Grid Grid.Column="1">
-                    <!-- Welcome Screen (Overlay) -->
-                    <views:WelcomeView x:Name="WelcomeScreen" 
-                                        Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}}"
-                                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <!-- GOODBYE SCREEN (hidden initially) -->
+                <Border x:Name="GoodbyePanel" Background="#181824" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Image Source="Resources/AppIcon.ico" Width="100" Height="100" Margin="0,0,0,24" HorizontalAlignment="Center" Opacity="0.8"/>
+                            <TextBlock Text="Thank You" Foreground="#E0E0E0" FontSize="42" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="Shutting down Bhavani Support Suite Pro" Foreground="#00ADB5" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <Border Background="#222232" CornerRadius="12" Padding="32,16" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Session ended at " Foreground="#888888" FontSize="12" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="GoodbyeTime" Text="" Foreground="#00ADB5" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Text="Developed by Dharmesh Varia | Bhavani Technology" Foreground="#888888" FontSize="12" HorizontalAlignment="Center" Margin="0,24,0,0"/>
+                        </StackPanel>
+                        
+                        <!-- Goodbye Status Bar -->
+                        <Border Grid.Row="1" Background="#12121C" Padding="20,12">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Border Background="#FFA502" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Application closing..." Foreground="#888888" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
 
-                    <!-- Goodbye Screen (Overlay) -->
-                    <views:GoodbyeView x:Name="GoodbyeScreen" 
-                                       Visibility="{Binding IsGoodbyeActive, Converter={StaticResource BoolToVisibilityConverter}}"
-                                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <!-- MAIN APPLICATION (hidden initially) -->
+                <Border x:Name="MainPanel" Background="#181824" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Main Application Content -->
-                    <Border Background="{StaticResource PrimaryBrush}" Padding="0"
-                            Visibility="{Binding IsWelcomeActive, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                        <Grid>
+                        <!-- Sidebar -->
+                        <Border x:Name="SidebarBorder" Grid.Column="0" Background="#12121C"
+                                Width="{Binding IsSidebarExpanded, Converter={x:Static vm:MainViewModel.SidebarWidthConverter}}"
+                                BorderBrush="#2A2A3C" BorderThickness="0,0,1,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
+                                    <ItemsControl ItemsSource="{Binding NavItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding ViewName}"
+                                                        Style="{StaticResource SidebarButtonStyle}"
+                                                        ToolTip="{Binding Label}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Icon}" FontFamily="Segoe MDL2 Assets" FontSize="16" Width="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding Label}" Grid.Column="1" FontSize="13" FontWeight="Medium" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+
+                                <Button Grid.Row="1" Command="{Binding ToggleSidebarCommand}" Style="{StaticResource SidebarButtonStyle}" HorizontalContentAlignment="Center" Height="48" Margin="8,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="Resources/AppIcon.ico" Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding IsSidebarExpanded, Converter={x:Static vm:MainViewModel.SidebarToggleConverter}}" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <!-- Content -->
+                        <Grid Grid.Column="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -181,42 +232,40 @@
                             </Grid.RowDefinitions>
 
                             <!-- Header -->
-                            <Border Grid.Row="0" Padding="28,20,28,16" Background="{StaticResource PrimaryBrush}">
+                            <Border Grid.Row="0" Padding="28,20,28,16" Background="#181824">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-
                                     <StackPanel>
                                         <TextBlock Text="{Binding CurrentView.Title}" Style="{StaticResource HeaderText}" />
                                         <TextBlock Style="{StaticResource SubHeaderText}" Margin="0,4,0,0">
-                                            <Run Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" />
+                                            <Run Text="Bhavani Technology" Foreground="#00ADB5" />
                                             <Run Text=" | Prepared by Dharmesh Varia" />
                                         </TextBlock>
                                     </StackPanel>
-
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                        <Border Background="#1E1E2E" CornerRadius="8" Padding="14,6" Margin="6,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="CPU " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <TextBlock Text="CPU " Foreground="#888888" FontSize="11" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
                                             </StackPanel>
                                         </Border>
-                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                        <Border Background="#1E1E2E" CornerRadius="8" Padding="14,6" Margin="6,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="MEM " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <TextBlock Text="MEM " Foreground="#888888" FontSize="11" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
                                             </StackPanel>
                                         </Border>
-                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                        <Border Background="#1E1E2E" CornerRadius="8" Padding="14,6" Margin="6,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="TEMP " Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <TextBlock Text="TEMP " Foreground="#888888" FontSize="11" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
                                             </StackPanel>
                                         </Border>
-                                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,6" Margin="6,0">
-                                            <TextBlock Text="{Binding CurrentTime}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center" />
+                                        <Border Background="#1E1E2E" CornerRadius="8" Padding="14,6" Margin="6,0">
+                                            <TextBlock Text="{Binding CurrentTime}" Foreground="#E0E0E0" FontSize="12" VerticalAlignment="Center" />
                                         </Border>
                                     </StackPanel>
                                 </Grid>
@@ -239,24 +288,24 @@
                             </Border>
 
                             <!-- Status Bar -->
-                            <Border Grid.Row="2" Background="{StaticResource SidebarBrush}" Padding="16,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+                            <Border Grid.Row="2" Background="#12121C" Padding="16,8" BorderBrush="#2A2A3C" BorderThickness="0,1,0,0">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Background="{StaticResource AccentBrush}" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding SystemStatus}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                                        <Border Background="#00ADB5" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding SystemStatus}" Foreground="#888888" FontSize="11" VerticalAlignment="Center" />
                                     </StackPanel>
-                                    <TextBlock Grid.Column="1" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center">
-                                        <Run Text="v1.0.0" /><Run Text=" | " /><Run Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" />
+                                    <TextBlock Grid.Column="1" Foreground="#888888" FontSize="11" VerticalAlignment="Center">
+                                        <Run Text="v1.0.0" /><Run Text=" | " /><Run Text="Bhavani Technology" Foreground="#00ADB5" />
                                     </TextBlock>
                                 </Grid>
                             </Border>
                         </Grid>
-                    </Border>
-                </Grid>
+                    </Grid>
+                </Border>
             </Grid>
         </Grid>
     </Border>
