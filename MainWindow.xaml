@@ -45,23 +45,9 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
-                    <Button Content="&#xE949;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource SidebarButtonStyle}" Width="36" Height="28" Padding="0" Click="MinimizeButton_Click" FontSize="10" HorizontalContentAlignment="Center" />
-                    <Button Content="&#xE739;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource SidebarButtonStyle}" Width="36" Height="28" Padding="0" Click="MaximizeButton_Click" FontSize="10" HorizontalContentAlignment="Center" />
-                    <Button Content="&#xE106;" FontFamily="Segoe MDL2 Assets" Width="36" Height="28" Padding="0" Click="CloseButton_Click" FontSize="10" HorizontalContentAlignment="Center" Foreground="{StaticResource DangerBrush}" Background="Transparent" BorderThickness="0">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border x:Name="border" Background="Transparent" CornerRadius="4">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="border" Property="Background" Value="#FF4757" />
-                                        <Setter Property="Foreground" Value="White" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
+                    <Button Content="&#xE949;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource TitleBarButtonStyle}" Width="46" Height="32" Padding="0" Click="MinimizeButton_Click" FontSize="12" HorizontalContentAlignment="Center" />
+                    <Button Content="&#xE739;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource TitleBarButtonStyle}" Width="46" Height="32" Padding="0" Click="MaximizeButton_Click" FontSize="12" HorizontalContentAlignment="Center" />
+                    <Button Content="&#xE106;" FontFamily="Segoe MDL2 Assets" Style="{StaticResource CloseButtonStyle}" Width="46" Height="32" Padding="0" Click="CloseButton_Click" FontSize="12" HorizontalContentAlignment="Center" />
                 </StackPanel>
             </Grid>
 
@@ -122,8 +108,9 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <!-- Header -->
-                        <Border Grid.Row="0" Padding="28,20,28,16" Background="{StaticResource PrimaryBrush}">
+                        <!-- Header (Hidden during Welcome/Goodbye) -->
+                        <Border Grid.Row="0" Padding="28,20,28,16" Background="{StaticResource PrimaryBrush}" 
+                                Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -164,8 +151,17 @@
                             </Grid>
                         </Border>
 
-                        <!-- View Content -->
-                        <Border Grid.Row="1" Padding="28,0,28,12">
+                        <!-- Welcome Screen -->
+                        <views:WelcomeView Grid.Row="1" 
+                                            Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <!-- Goodbye Screen -->
+                        <views:GoodbyeView Grid.Row="1" 
+                                           Visibility="{Binding IsGoodbyeActive, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <!-- View Content (Hidden during Welcome/Goodbye) -->
+                        <Border Grid.Row="1" Padding="28,0,28,12" 
+                                Visibility="{Binding IsWelcomeActive, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Inverse}">
                             <ContentControl Content="{Binding CurrentView}">
                                 <ContentControl.Resources>
                                     <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView /></DataTemplate>

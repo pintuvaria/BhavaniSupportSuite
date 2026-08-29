@@ -37,6 +37,12 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _currentTime;
 
+    [ObservableProperty]
+    private bool _isWelcomeActive;
+
+    [ObservableProperty]
+    private bool _isGoodbyeActive;
+
     public ObservableCollection<NavItem> NavItems { get; } = new()
     {
         new NavItem { Icon = "\uE80F", Label = "Dashboard", ViewName = "Dashboard" },
@@ -70,6 +76,8 @@ public partial class MainViewModel : ViewModelBase
         _isSidebarExpanded = true;
         _systemStatus = "Ready";
         _currentTime = DateTime.Now.ToString("HH:mm:ss");
+        _isWelcomeActive = true;
+        _isGoodbyeActive = false;
 
         DashboardVM = new DashboardViewModel(_diagnosticsService);
         HardwareVM = new HardwareViewModel();
@@ -84,6 +92,13 @@ public partial class MainViewModel : ViewModelBase
 
         _ = StartPerformanceCountersAsync();
         _ = UpdateClockAsync();
+        _ = ShowWelcomeScreenAsync();
+    }
+
+    private async Task ShowWelcomeScreenAsync()
+    {
+        await Task.Delay(3000);
+        IsWelcomeActive = false;
     }
 
     [RelayCommand]
@@ -108,6 +123,12 @@ public partial class MainViewModel : ViewModelBase
     private void ToggleSidebar()
     {
         IsSidebarExpanded = !IsSidebarExpanded;
+    }
+
+    public void ShowGoodbye()
+    {
+        IsGoodbyeActive = true;
+        IsWelcomeActive = false;
     }
 
     private async Task StartPerformanceCountersAsync()

@@ -1,0 +1,86 @@
+<UserControl x:Class="BhavaniSupportSuite.Views.WelcomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Width="800" Height="500">
+    
+    <Grid Background="{StaticResource PrimaryBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Logo -->
+            <Image Grid.Row="0" Source="Resources/AppIcon.ico" Width="120" Height="120" 
+                   RenderOptions.BitmapScalingMode="HighQuality" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60,0,20"/>
+
+            <!-- Title -->
+            <TextBlock Grid.Row="1" Text="Bhavani Support Suite Pro" 
+                       Style="{StaticResource WelcomeTitle}" Margin="0,20,0,10"/>
+
+            <!-- Subtitle -->
+            <TextBlock Grid.Row="2" Text="Enterprise System Diagnostics &amp; Management" 
+                       Style="{StaticResource WelcomeSubtitle}" Margin="0,0,0,20"/>
+
+            <!-- Version Info -->
+            <TextBlock Grid.Row="3" Text="Version 1.0.0 | .NET 8 | WPF" 
+                       Style="{StaticResource WelcomeText}" Margin="0,0,0,10"/>
+
+            <!-- Developer Info -->
+            <Border Grid.Row="4" Background="{StaticResource CardBrush}" CornerRadius="12" 
+                    Padding="30,15" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Developer: " Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" VerticalAlignment="Center"/>
+                    <TextBlock Text="Dharmesh Varia" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="  |  " Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" VerticalAlignment="Center"/>
+                    <TextBlock Text="Bhavani Technology" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="1" Background="{StaticResource SidebarBrush}" Padding="20,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Border Background="{StaticResource SuccessBrush}" Width="8" Height="8" CornerRadius="4" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock Text="System Ready" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Loading Animation -->
+        <Border Grid.Row="2" Background="{StaticResource SidebarBrush}" Padding="20,8">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <TextBlock Text="Initializing modules" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
+                <TextBlock Text="..." Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center">
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever">
+                                    <StringAnimationUsingKeyFrames Storyboard.TargetProperty="Text">
+                                        <DiscreteStringKeyFrame KeyTime="0:0:0.0" Value="."/>
+                                        <DiscreteStringKeyFrame KeyTime="0:0:0.3" Value=".."/>
+                                        <DiscreteStringKeyFrame KeyTime="0:0:0.6" Value="..."/>
+                                        <DiscreteStringKeyFrame KeyTime="0:0:0.9" Value=""/>
+                                    </StringAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

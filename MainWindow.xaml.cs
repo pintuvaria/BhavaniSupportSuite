@@ -1,13 +1,22 @@
 using System.Windows;
 using System.Windows.Input;
+using BhavaniSupportSuite.ViewModels;
 
 namespace BhavaniSupportSuite;
 
 public partial class MainWindow : Window
 {
+    private MainViewModel? _viewModel;
+
     public MainWindow()
     {
         InitializeComponent();
+        Loaded += MainWindow_Loaded;
+    }
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        _viewModel = DataContext as MainViewModel;
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -34,8 +43,10 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    private async void CloseButton_Click(object sender, RoutedEventArgs e)
     {
+        _viewModel?.ShowGoodbye();
+        await Task.Delay(2000);
         Application.Current.Shutdown();
     }
 }
