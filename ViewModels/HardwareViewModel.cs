@@ -24,7 +24,7 @@ public partial class HardwareViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage;
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private float _cpuTemperature;
@@ -48,10 +48,7 @@ public partial class HardwareViewModel : ViewModelBase
         await Task.Run(() =>
         {
             var info = HardwareService.GetDetailedHardwareInfo();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                HardwareInfo = new ObservableCollection<HardwareInfo>(info);
-            });
+            SafeDispatch(() => HardwareInfo = new ObservableCollection<HardwareInfo>(info));
         });
 
         StatusMessage = $"Loaded {HardwareInfo.Count} hardware entries.";
@@ -67,10 +64,7 @@ public partial class HardwareViewModel : ViewModelBase
         await Task.Run(() =>
         {
             var statuses = HardwareService.GetSmartStatus();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                SmartStatuses = new ObservableCollection<SmartStatus>(statuses);
-            });
+            SafeDispatch(() => SmartStatuses = new ObservableCollection<SmartStatus>(statuses));
         });
 
         StatusMessage = $"SMART check complete. {SmartStatuses.Count} drives found.";

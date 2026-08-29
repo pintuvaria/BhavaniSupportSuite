@@ -25,7 +25,7 @@ public partial class StorageViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage;
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private int _progressValue;
@@ -35,7 +35,7 @@ public partial class StorageViewModel : ViewModelBase
 
     public StorageViewModel()
     {
-        Title = "Storage &amp; Drivers";
+        Title = "Storage & Drivers";
         StatusMessage = "Ready";
         BackupDestination = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "DriverBackup");
         _ = LoadDiskInfoAsync();
@@ -46,10 +46,7 @@ public partial class StorageViewModel : ViewModelBase
         await Task.Run(() =>
         {
             var info = StorageService.GetDiskSpaceInfo();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                DiskSpaceInfo = new ObservableCollection<string>(info);
-            });
+            SafeDispatch(() => DiskSpaceInfo = new ObservableCollection<string>(info));
         });
     }
 
@@ -66,7 +63,7 @@ public partial class StorageViewModel : ViewModelBase
 
         var progress = new Progress<string>(msg =>
         {
-            App.Current.Dispatcher.Invoke(() => CleanLog.Add(msg));
+            SafeDispatch(() => CleanLog.Add(msg));
         });
 
         var results = await StorageService.RunDeepCleanAsync(progress);

@@ -26,7 +26,7 @@ public partial class RecoveryViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage;
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private string? _selectedServiceName;
@@ -83,7 +83,7 @@ public partial class RecoveryViewModel : ViewModelBase
                 var serviceController = System.ServiceProcess.ServiceController.GetServices();
                 foreach (var svc in serviceController)
                 {
-                    App.Current.Dispatcher.Invoke(() =>
+                    SafeDispatch(() =>
                     {
                         Services.Add(new ServiceInfo
                         {
@@ -150,7 +150,7 @@ public partial class RecoveryViewModel : ViewModelBase
                             (entry.EntryType == System.Diagnostics.EventLogEntryType.Error ||
                              entry.EntryType == System.Diagnostics.EventLogEntryType.Warning))
                         {
-                            App.Current.Dispatcher.Invoke(() =>
+                            SafeDispatch(() =>
                             {
                                 CriticalEvents.Add(new EventLogEntry
                                 {

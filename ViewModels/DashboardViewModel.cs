@@ -125,8 +125,8 @@ public partial class DashboardViewModel : ViewModelBase
             RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] Starting: {name}...");
             RepairStatus = $"Running: {name}";
 
-            _diagnostics.OutputReceived += msg => App.Current.Dispatcher.Invoke(() => RepairLog.Add($"  {msg}"));
-            _diagnostics.ErrorReceived += msg => App.Current.Dispatcher.Invoke(() => RepairLog.Add($"  [ERR] {msg}"));
+            _diagnostics.OutputReceived += msg => SafeDispatch(() => RepairLog.Add($"  {msg}"));
+            _diagnostics.ErrorReceived += msg => SafeDispatch(() => RepairLog.Add($"  [ERR] {msg}"));
 
             var exitCode = await _diagnostics.RunCommandAsync(fileName, args);
             RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] {name} completed with exit code: {exitCode}");

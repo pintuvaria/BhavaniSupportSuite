@@ -91,8 +91,8 @@ public partial class StagingViewModel : ViewModelBase
             InstallStatus = $"Installing: {package.Name}...";
             InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] Starting installation: {package.Name}");
 
-            _diagnostics.OutputReceived += msg => App.Current.Dispatcher.Invoke(() => InstallLog.Add($"  {msg}"));
-            _diagnostics.ErrorReceived += msg => App.Current.Dispatcher.Invoke(() => InstallLog.Add($"  [ERR] {msg}"));
+            _diagnostics.OutputReceived += msg => SafeDispatch(() => InstallLog.Add($"  {msg}"));
+            _diagnostics.ErrorReceived += msg => SafeDispatch(() => InstallLog.Add($"  [ERR] {msg}"));
 
             var exitCode = await _diagnostics.RunCommandAsync("cmd", $"/c winget install --id {package.WingetId} {package.SilentArgs} --accept-source-agreements --accept-package-agreements");
             InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] {package.Name} completed with exit code: {exitCode}");

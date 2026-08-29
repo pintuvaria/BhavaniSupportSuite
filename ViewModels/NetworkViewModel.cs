@@ -37,7 +37,7 @@ public partial class NetworkViewModel : ViewModelBase
     private bool _isScanning;
 
     [ObservableProperty]
-    private string _scanStatus;
+    private string _scanStatus = string.Empty;
 
     [ObservableProperty]
     private int _scanProgress;
@@ -55,13 +55,43 @@ public partial class NetworkViewModel : ViewModelBase
         Title = "Network Scanner";
         _scanStatus = "Ready";
 
-        _scanner.HostDiscovered += host => App.Current.Dispatcher.Invoke(() => ScanResults.Add(host));
-        _scanner.ScanProgress += msg => App.Current.Dispatcher.Invoke(() => ScanStatus = msg);
-        _scanner.ProgressChanged += (completed, total) => App.Current.Dispatcher.Invoke(() =>
+        _scanner.HostDiscovered += OnHostDiscovered;
+        _scanner.ScanProgress += OnScanProgress;
+        _scanner.ProgressChanged += OnProgressChanged;
+    }
+
+    private void OnHostDiscovered(ScanResult host)
+    {
+        try
         {
-            ScanProgress = completed;
-            ScanTotal = total;
-        });
+            if (System.Windows.Application.Current?.Dispatcher != null)
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ScanResults.Add(host));
+        }
+        catch { }
+    }
+
+    private void OnScanProgress(string msg)
+    {
+        try
+        {
+            if (System.Windows.Application.Current?.Dispatcher != null)
+                System.Windows.Application.Current.Dispatcher.Invoke(() => ScanStatus = msg);
+        }
+        catch { }
+    }
+
+    private void OnProgressChanged(int completed, int total)
+    {
+        try
+        {
+            if (System.Windows.Application.Current?.Dispatcher != null)
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ScanProgress = completed;
+                    ScanTotal = total;
+                });
+        }
+        catch { }
     }
 
     [RelayCommand]

@@ -26,7 +26,7 @@ public partial class SecurityViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage;
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private bool _usbStorageEnabled;
@@ -56,10 +56,7 @@ public partial class SecurityViewModel : ViewModelBase
         await Task.Run(() =>
         {
             var processes = SecurityService.GetRunningProcesses();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                RunningProcesses = new ObservableCollection<ProcessInfo>(processes);
-            });
+            SafeDispatch(() => RunningProcesses = new ObservableCollection<ProcessInfo>(processes));
         });
 
         StatusMessage = $"Loaded {RunningProcesses.Count} processes.";
@@ -88,10 +85,7 @@ public partial class SecurityViewModel : ViewModelBase
         await Task.Run(() =>
         {
             var tasks = SecurityService.GetScheduledTasks();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                ScheduledTasks = new ObservableCollection<ScheduledTaskInfo>(tasks);
-            });
+            SafeDispatch(() => ScheduledTasks = new ObservableCollection<ScheduledTaskInfo>(tasks));
         });
 
         StatusMessage = $"Found {ScheduledTasks.Count} scheduled tasks.";
@@ -107,10 +101,7 @@ public partial class SecurityViewModel : ViewModelBase
         await Task.Run(() =>
         {
             var unsigned = SecurityService.GetUnsignedBinaries();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                UnsignedBinaries = new ObservableCollection<string>(unsigned);
-            });
+            SafeDispatch(() => UnsignedBinaries = new ObservableCollection<string>(unsigned));
         });
 
         StatusMessage = $"Found {UnsignedBinaries.Count} unsigned binaries.";
