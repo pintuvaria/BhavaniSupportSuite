@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w33.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#181824"/>
+      <stop offset="100%" style="stop-color:#222232"/>
+    </linearGradient>
+    <linearGradient id="accent4" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ADB5"/>
+      <stop offset="100%" style="stop-color:#00CED1"/>
+    </linearGradient>
+    <filter id="glow4">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg4)"/>
+  <!-- Outer Ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#2A2A3C" stroke-width="8"/>
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#accent4)" stroke-width="8" 
+          stroke-dasharray="200 140" stroke-linecap="round" filter="url(#glow4)"/>
+  <!-- Monitor Frame -->
+  <rect x="156" y="120" width="200" height="140" rx="12" fill="#222232" stroke="#00ADB5" stroke-width="4"/>
+  <!-- Screen Content - Wave -->
+  <path d="M176 200 L196 180 L216 210 L236 170 L256 220 L276 160 L296 190 L316 180 L336 200" 
+        stroke="#00ADB5" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Monitor Stand -->
+  <rect x="236" y="260" width="40" height="20" fill="#00ADB5"/>
+  <rect x="220" y="280" width="72" height="8" rx="4" fill="#00ADB5"/>
+  <!-- Dashboard Cards -->
+  <rect x="130" y="310" width="80" height="50" rx="8" fill="#222232" stroke="#00ADB540" stroke-width="2"/>
+  <rect x="216" y="310" width="80" height="50" rx="8" fill="#222232" stroke="#00ADB540" stroke-width="2"/>
+  <rect x="302" y="310" width="80" height="50" rx="8" fill="#222232" stroke="#00ADB540" stroke-width="2"/>
+  <!-- Card Bars -->
+  <rect x="140" y="340" width="20" height="14" rx="2" fill="#00ADB5"/>
+  <rect x="165" y="335" width="35" height="6" rx="2" fill="#00ADB560"/>
+  <rect x="165" y="345" width="25" height="4" rx="1" fill="#00ADB540"/>
+  <rect x="226" y="340" width="20" height="14" rx="2" fill="#00CED1"/>
+  <rect x="251" y="335" width="35" height="6" rx="2" fill="#00CED160"/>
+  <rect x="251" y="345" width="25" height="4" rx="1" fill="#00CED140"/>
+  <rect x="312" y="340" width="20" height="14" rx="2" fill="#2ED573"/>
+  <rect x="337" y="335" width="35" height="6" rx="2" fill="#2ED57360"/>
+  <rect x="337" y="345" width="25" height="4" rx="1" fill="#2ED57340"/>
+  <!-- Pulse Indicator -->
+  <circle cx="256" cy="400" r="30" fill="none" stroke="#00ADB5" stroke-width="3"/>
+  <path d="M236 400 L248 400 L253 385 L261 415 L266 400 L280 400" stroke="#00ADB5" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Bottom Text -->
+  <text x="256" y="470" text-anchor="middle" font-family="Segoe UI, Arial" font-size="20" font-weight="bold" fill="#00ADB5">DASHBOARD</text>
+</svg>

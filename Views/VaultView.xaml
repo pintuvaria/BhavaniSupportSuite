@@ -1,0 +1,123 @@
+<UserControl x:Class="BhavaniSupportSuite.Views.VaultView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+             mc:Ignorable="d"
+             Foreground="{StaticResource TextPrimaryBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Backup Profiles -->
+            <Border Grid.Row="0" Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock Text="Local Profile Snapshot" Style="{StaticResource SectionTitle}" />
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Destination:" VerticalAlignment="Center" Margin="0,0,8,0"
+                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBox Grid.Column="1" Text="{Binding BackupDestination}" VerticalAlignment="Center" />
+                        <Button Grid.Column="2" Content="Create Backup"
+                                Command="{Binding CreateBackupCommand}"
+                                Style="{StaticResource AccentButtonStyle}" Margin="12,0,0,0"
+                                IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                        <Button Grid.Column="3" Content="Restore"
+                                Command="{Binding RestoreBackupCommand}"
+                                Style="{StaticResource AccentButtonStyle}" Margin="8,0,0,0"
+                                Background="{StaticResource WarningBrush}"
+                                IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                    </Grid>
+
+                    <!-- Progress -->
+                    <Grid Margin="0,0,0,12">
+                        <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Height="4" />
+                        <TextBlock HorizontalAlignment="Right" Text="{Binding StatusMessage}"
+                                   Style="{StaticResource StatusText}" Margin="0,6,0,0" />
+                    </Grid>
+
+                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12">
+                        <DataGrid ItemsSource="{Binding Profiles}" AutoGenerateColumns="False"
+                                  Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                  BorderThickness="0" GridLinesVisibility="None"
+                                  HeadersVisibility="Column" RowBackground="{StaticResource CardBrush}"
+                                  AlternatingRowBackground="{StaticResource SurfaceBrush}"
+                                  CanUserAddRows="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected, Mode=TwoWay}"
+                                                        Width="60" />
+                                <DataGridTextColumn Header="Profile" Binding="{Binding Name}" Width="*" />
+                                <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Differential Backup Info -->
+            <Border Grid.Row="1" Style="{StaticResource CardBorder}" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="Differential Backup Engine" Style="{StaticResource SectionTitle}" />
+                    <TextBlock Text="Supports incremental file versioning and multi-retention restore points."
+                               Style="{StaticResource StatusText}" Margin="0,0,0,12" />
+
+                    <UniformGrid Columns="3">
+                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="Retention Policy" Style="{StaticResource StatusText}" />
+                                <TextBlock Text="7 Days" Foreground="{StaticResource TextPrimaryBrush}"
+                                           FontSize="20" FontWeight="Bold" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="4,0">
+                            <StackPanel>
+                                <TextBlock Text="Last Backup" Style="{StaticResource StatusText}" />
+                                <TextBlock Text="N/A" Foreground="{StaticResource TextPrimaryBrush}"
+                                           FontSize="20" FontWeight="Bold" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Storage Used" Style="{StaticResource StatusText}" />
+                                <TextBlock Text="0 MB" Foreground="{StaticResource TextPrimaryBrush}"
+                                           FontSize="20" FontWeight="Bold" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+
+            <!-- Backup Log -->
+            <Border Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="Backup Log" Style="{StaticResource SectionTitle}" />
+                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="12" MaxHeight="200">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding BackupLog}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Foreground="{StaticResource TextSecondaryBrush}"
+                                                   FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,2" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#181824"/>
+      <stop offset="100%" style="stop-color:#222232"/>
+    </linearGradient>
+    <linearGradient id="accent10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADB5"/>
+      <stop offset="50%" style="stop-color:#00CED1"/>
+      <stop offset="100%" style="stop-color:#2ED573"/>
+    </linearGradient>
+    <filter id="glow10">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="60" fill="url(#bg10)"/>
+  <!-- Abstract Diamond Shape -->
+  <g transform="translate(256,230)" filter="url(#glow10)">
+    <!-- Outer Diamond -->
+    <polygon points="0,-160 160,0 0,160 -160,0" fill="none" stroke="url(#accent10)" stroke-width="4"/>
+    <!-- Middle Diamond -->
+    <polygon points="0,-110 110,0 0,110 -110,0" fill="none" stroke="#00ADB560" stroke-width="3"/>
+    <!-- Inner Diamond -->
+    <polygon points="0,-60 60,0 0,60 -60,0" fill="#222232" stroke="url(#accent10)" stroke-width="3"/>
+    <!-- Center Dot -->
+    <circle cx="0" cy="0" r="15" fill="url(#accent10)"/>
+    <!-- Corner Accents -->
+    <circle cx="0" cy="-160" r="8" fill="#00ADB5"/>
+    <circle cx="160" cy="0" r="8" fill="#00CED1"/>
+    <circle cx="0" cy="160" r="8" fill="#2ED573"/>
+    <circle cx="-160" cy="0" r="8" fill="#00ADB5"/>
+    <!-- Connecting Lines -->
+    <line x1="0" y1="-60" x2="0" y2="-160" stroke="#00ADB540" stroke-width="2"/>
+    <line x1="60" y1="0" x2="160" y2="0" stroke="#00CED140" stroke-width="2"/>
+    <line x1="0" y1="60" x2="0" y2="160" stroke="#2ED57340" stroke-width="2"/>
+    <line x1="-60" y1="0" x2="-160" y2="0" stroke="#00ADB540" stroke-width="2"/>
+  </g>
+  <!-- Horizontal Lines -->
+  <g stroke="#00ADB530" stroke-width="1">
+    <line x1="40" y1="100" x2="120" y2="100"/>
+    <line x1="392" y1="100" x2="472" y2="100"/>
+    <line x1="40" y1="370" x2="120" y2="370"/>
+    <line x1="392" y1="370" x2="472" y2="370"/>
+  </g>
+  <!-- Top Corner Decorations -->
+  <rect x="50" y="50" width="40" height="4" rx="2" fill="#00ADB540"/>
+  <rect x="50" y="50" width="4" height="40" rx="2" fill="#00ADB540"/>
+  <rect x="422" y="50" width="40" height="4" rx="2" fill="#00ADB540"/>
+  <rect x="458" y="50" width="4" height="40" rx="2" fill="#00ADB540"/>
+  <!-- Bottom Corner Decorations -->
+  <rect x="50" y="458" width="40" height="4" rx="2" fill="#00ADB540"/>
+  <rect x="50" y="422" width="4" height="40" rx="2" fill="#00ADB540"/>
+  <rect x="422" y="458" width="40" height="4" rx="2" fill="#00ADB540"/>
+  <rect x="458" y="422" width="4" height="40" rx="2" fill="#00ADB540"/>
+  <!-- Brand Text -->
+  <text x="256" y="430" text-anchor="middle" font-family="Segoe UI, Arial" font-size="28" font-weight="bold" fill="#00ADB5">BHAVANI</text>
+  <text x="256" y="460" text-anchor="middle" font-family="Segoe UI, Arial" font-size="14" fill="#888888">SUPPORT SUITE PRO</text>
+  <text x="256" y="490" text-anchor="middle" font-family="Segoe UI, Arial" font-size="10" fill="#00ADB560">v1.0.0 | Bhavani Technology</text>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#181824"/>
+      <stop offset="100%" style="stop-color:#222232"/>
+    </linearGradient>
+    <linearGradient id="accent6" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ADB5"/>
+      <stop offset="100%" style="stop-color:#00CED1"/>
+    </linearGradient>
+    <filter id="glow6">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="48" fill="url(#bg6)"/>
+  <!-- Terminal Window - Larger -->
+  <rect x="60" y="80" width="392" height="320" rx="20" fill="#0A0A12" stroke="#00ADB5" stroke-width="4" filter="url(#glow6)"/>
+  <!-- Title Bar -->
+  <rect x="60" y="80" width="392" height="50" rx="20" fill="#222232"/>
+  <rect x="60" y="110" width="392" height="20" fill="#222232"/>
+  <!-- Window Controls - Larger -->
+  <circle cx="100" cy="105" r="10" fill="#FF4757"/>
+  <circle cx="130" cy="105" r="10" fill="#FFA502"/>
+  <circle cx="160" cy="105" r="10" fill="#2ED573"/>
+  <!-- Title Text - Larger -->
+  <text x="256" y="110" text-anchor="middle" font-family="Consolas, monospace" font-size="16" font-weight="bold" fill="#FFFFFF">Bhavani Support Suite Pro</text>
+  <!-- Terminal Content - Larger Font -->
+  <g font-family="Consolas, monospace" font-size="16">
+    <!-- Command Line -->
+    <text x="90" y="175" fill="#00ADB5">C:\BhavaniSupport&gt;</text>
+    <text x="290" y="175" fill="#2ED573" font-weight="bold">system --scan</text>
+    <text x="290" y="175" fill="#2ED573">_</text>
+    <!-- Info Line -->
+    <text x="90" y="205" fill="#888888">[INFO] Initializing system scan...</text>
+    <!-- Status Lines -->
+    <text x="90" y="235" fill="#2ED573" font-weight="bold">[OK]</text>
+    <text x="135" y="235" fill="#FFFFFF">CPU Usage: 45%</text>
+    <text x="90" y="265" fill="#2ED573" font-weight="bold">[OK]</text>
+    <text x="135" y="265" fill="#FFFFFF">Memory: 67%</text>
+    <text x="90" y="295" fill="#2ED573" font-weight="bold">[OK]</text>
+    <text x="135" y="295" fill="#FFFFFF">Disk Health: Good</text>
+    <text x="90" y="325" fill="#2ED573" font-weight="bold">[OK]</text>
+    <text x="135" y="325" fill="#FFFFFF">Network: Connected</text>
+    <!-- Success Message -->
+    <text x="90" y="365" fill="#2ED573" font-weight="bold">Scan complete. All systems operational.</text>
+    <!-- Prompt -->
+    <text x="90" y="400" fill="#00ADB5">C:\BhavaniSupport&gt;</text>
+    <text x="290" y="400" fill="#FFFFFF" font-weight="bold">_</text>
+  </g>
+  <!-- Pulse Line - Thicker -->
+  <path d="M60 440 L160 440 L180 415 L200 465 L220 415 L240 465 L260 440 L452 440" 
+        stroke="url(#accent6)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow6)"/>
+  <!-- Bottom Text - Larger -->
+  <text x="256" y="490" text-anchor="middle" font-family="Segoe UI, Arial" font-size="22" font-weight="bold" fill="#00ADB5">SYSTEM TOOLS</text>
+</svg>

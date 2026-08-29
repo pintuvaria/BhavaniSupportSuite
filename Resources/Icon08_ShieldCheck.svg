@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#181824"/>
+      <stop offset="100%" style="stop-color:#222232"/>
+    </linearGradient>
+    <linearGradient id="accent8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADB5"/>
+      <stop offset="100%" style="stop-color:#2ED573"/>
+    </linearGradient>
+    <filter id="glow8">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="50" fill="url(#bg8)"/>
+  <!-- Shield Outline -->
+  <path d="M256 60 L420 140 L420 300 Q420 420 256 480 Q92 420 92 300 L92 140 Z" 
+        fill="#12121C" stroke="url(#accent8)" stroke-width="5" filter="url(#glow8)"/>
+  <!-- Inner Shield -->
+  <path d="M256 100 L390 165 L390 295 Q390 395 256 445 Q122 395 122 295 L122 165 Z" 
+        fill="none" stroke="#00ADB530" stroke-width="2"/>
+  <!-- Checkmark -->
+  <path d="M180 270 L230 320 L340 200" stroke="url(#accent8)" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow8)"/>
+  <!-- Shield Decorations -->
+  <circle cx="256" cy="160" r="20" fill="none" stroke="#00ADB560" stroke-width="2"/>
+  <circle cx="256" cy="160" r="8" fill="#00ADB5"/>
+  <!-- Side Lines -->
+  <line x1="160" y1="220" x2="200" y2="220" stroke="#00ADB540" stroke-width="2"/>
+  <line x1="312" y1="220" x2="352" y2="220" stroke="#00ADB540" stroke-width="2"/>
+  <line x1="160" y1="360" x2="200" y2="360" stroke="#00ADB540" stroke-width="2"/>
+  <line x1="312" y1="360" x2="352" y2="360" stroke="#00ADB540" stroke-width="2"/>
+  <!-- Status Indicators -->
+  <circle cx="180" cy="400" r="8" fill="#2ED573"/>
+  <circle cx="256" cy="420" r="8" fill="#2ED573"/>
+  <circle cx="332" cy="400" r="8" fill="#2ED573"/>
+  <!-- Bottom Text -->
+  <text x="256" y="500" text-anchor="middle" font-family="Segoe UI, Arial" font-size="20" font-weight="bold" fill="#00ADB5">SECURITY</text>
+</svg>

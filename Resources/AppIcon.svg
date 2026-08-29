@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#12121C"/>
+      <stop offset="100%" style="stop-color:#181824"/>
+    </linearGradient>
+    <linearGradient id="accent3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADB5"/>
+      <stop offset="100%" style="stop-color:#00CED1"/>
+    </linearGradient>
+    <filter id="glow3">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect x="16" y="16" width="480" height="480" rx="48" fill="url(#bg3)" stroke="#00ADB540" stroke-width="3"/>
+  <!-- Circuit Board Pattern - Thicker Lines -->
+  <g stroke="#00ADB560" stroke-width="3" fill="none">
+    <line x1="80" y1="80" x2="80" y2="180"/>
+    <line x1="80" y1="130" x2="160" y2="130"/>
+    <line x1="432" y1="80" x2="432" y2="180"/>
+    <line x1="432" y1="130" x2="352" y2="130"/>
+    <line x1="80" y1="432" x2="80" y2="332"/>
+    <line x1="80" y1="382" x2="160" y2="382"/>
+    <line x1="432" y1="432" x2="432" y2="332"/>
+    <line x1="432" y1="382" x2="352" y2="382"/>
+  </g>
+  <!-- Circuit Nodes - Larger -->
+  <circle cx="80" cy="180" r="8" fill="#00ADB5"/>
+  <circle cx="160" cy="130" r="8" fill="#00ADB5"/>
+  <circle cx="432" cy="180" r="8" fill="#00ADB5"/>
+  <circle cx="352" cy="130" r="8" fill="#00ADB5"/>
+  <circle cx="80" cy="332" r="8" fill="#00ADB5"/>
+  <circle cx="160" cy="382" r="8" fill="#00ADB5"/>
+  <circle cx="432" cy="332" r="8" fill="#00ADB5"/>
+  <circle cx="352" cy="382" r="8" fill="#00ADB5"/>
+  <!-- Central Gear - Larger & Bolder -->
+  <circle cx="256" cy="230" r="90" fill="none" stroke="url(#accent3)" stroke-width="10" filter="url(#glow3)"/>
+  <circle cx="256" cy="230" r="65" fill="none" stroke="#00ADB580" stroke-width="4"/>
+  <circle cx="256" cy="230" r="25" fill="#00ADB5"/>
+  <!-- Gear Teeth - Larger & Bolder -->
+  <g fill="#00ADB5" filter="url(#glow3)">
+    <!-- Top -->
+    <rect x="248" y="125" width="16" height="30" rx="4"/>
+    <!-- Bottom -->
+    <rect x="248" y="305" width="16" height="30" rx="4"/>
+    <!-- Left -->
+    <rect x="151" y="222" width="30" height="16" rx="4"/>
+    <!-- Right -->
+    <rect x="331" y="222" width="30" height="16" rx="4"/>
+    <!-- Diagonals -->
+    <rect x="183" y="158" width="20" height="16" rx="4" transform="rotate(45 193 166)"/>
+    <rect x="309" y="158" width="20" height="16" rx="4" transform="rotate(-45 319 166)"/>
+    <rect x="183" y="286" width="20" height="16" rx="4" transform="rotate(-45 193 294)"/>
+    <rect x="309" y="286" width="20" height="16" rx="4" transform="rotate(45 319 294)"/>
+  </g>
+  <!-- Lightning Bolt - Larger & More Visible -->
+  <path d="M244 195 L262 230 L252 230 L270 275 L238 230 L248 230 Z" fill="#FFD700" stroke="#FFA500" stroke-width="2"/>
+  <!-- Bottom Banner - Larger Text -->
+  <rect x="100" y="395" width="312" height="60" rx="30" fill="#00ADB5"/>
+  <text x="256" y="435" text-anchor="middle" font-family="Segoe UI, Arial" font-size="28" font-weight="bold" fill="#181824">TECHNOLOGY</text>
+  <!-- Top Label -->
+  <text x="256" y="70" text-anchor="middle" font-family="Segoe UI, Arial" font-size="16" font-weight="bold" fill="#00ADB5">CIRCUIT TOOLS</text>
+</svg>

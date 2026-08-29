@@ -1,0 +1,111 @@
+<UserControl x:Class="BhavaniSupportSuite.Views.StorageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+             Foreground="{StaticResource TextPrimaryBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Disk Space Overview -->
+            <Border Grid.Row="0" Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="Disk Space Overview" Style="{StaticResource SectionTitle}" />
+                        <Button Content="Refresh" Command="{Binding RefreshDiskInfoCommand}" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}" FontSize="11" Padding="12,4" />
+                    </Grid>
+                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="12" MaxHeight="200">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DiskSpaceInfo}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Consolas" FontSize="12" TextWrapping="Wrap" Margin="0,2" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Deep Clean & Driver Backup -->
+            <Grid Grid.Row="1" Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="Deep Junk Cleaner" Style="{StaticResource SectionTitle}" />
+                        <TextBlock Text="Purges SoftwareDistribution, TEMP, Prefetch, and log dumps." Style="{StaticResource StatusText}" Margin="0,0,0,12" />
+                        <Button Content="Run Deep Clean" Command="{Binding RunDeepCleanCommand}" Style="{StaticResource AccentButtonStyle}" IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" HorizontalAlignment="Left" />
+                        <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Margin="0,12,0,0" Height="4" />
+                        <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource StatusText}" Margin="0,8,0,0" />
+
+                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="12" MaxHeight="200" Margin="0,12,0,0">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding CleanLog}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="{StaticResource TextSecondaryBrush}" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,2" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardBorder}" Margin="8,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Driver Backup Utility" Style="{StaticResource SectionTitle}" />
+                        <TextBlock Text="Export active third-party INF drivers for offline staging." Style="{StaticResource StatusText}" Margin="0,0,0,12" />
+                        <Button Content="Load Drivers" Command="{Binding LoadDriversCommand}" Style="{StaticResource AccentButtonStyle}" IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" HorizontalAlignment="Left" Margin="0,0,0,8" />
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Path:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}" />
+                            <TextBox Grid.Column="1" Text="{Binding BackupDestination}" />
+                            <Button Grid.Column="2" Content="Backup" Command="{Binding BackupDriversCommand}" Style="{StaticResource AccentButtonStyle}" Margin="8,0,0,0" FontSize="11" Padding="12,4" />
+                        </Grid>
+
+                        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="8" MaxHeight="200">
+                            <DataGrid ItemsSource="{Binding Drivers}" AutoGenerateColumns="False" Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}" BorderThickness="0" GridLinesVisibility="None" HeadersVisibility="Column" RowBackground="{StaticResource CardBrush}" CanUserAddRows="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                                    <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="80" />
+                                    <DataGridTextColumn Header="Class" Binding="{Binding Class}" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Clean Results -->
+            <Border Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="Clean Results" Style="{StaticResource SectionTitle}" />
+                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12" MaxHeight="200">
+                        <DataGrid ItemsSource="{Binding CleanResults}" AutoGenerateColumns="False" Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}" BorderThickness="0" GridLinesVisibility="None" HeadersVisibility="Column" RowBackground="{StaticResource CardBrush}" CanUserAddRows="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*" />
+                                <DataGridTextColumn Header="Files Deleted" Binding="{Binding FilesDeleted}" Width="100" />
+                                <DataGridTextColumn Header="MB Freed" Binding="{Binding BytesFreed}" Width="100" />
+                                <DataGridTextColumn Header="Status" Binding="{Binding Success}" Width="80" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

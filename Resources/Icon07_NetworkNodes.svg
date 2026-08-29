@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#181824"/>
+      <stop offset="100%" style="stop-color:#1E1E2E"/>
+    </linearGradient>
+    <linearGradient id="accent7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ADB5"/>
+      <stop offset="100%" style="stop-color:#00CED1"/>
+    </linearGradient>
+    <filter id="glow7">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg7)"/>
+  <!-- Network Nodes -->
+  <g filter="url(#glow7)">
+    <!-- Central Node -->
+    <circle cx="256" cy="256" r="35" fill="url(#accent7)"/>
+    <circle cx="256" cy="256" r="25" fill="#181824"/>
+    <circle cx="256" cy="256" r="12" fill="#00ADB5"/>
+    <!-- Top Node -->
+    <circle cx="256" cy="100" r="20" fill="#222232" stroke="#00ADB5" stroke-width="3"/>
+    <circle cx="256" cy="100" r="8" fill="#00ADB5"/>
+    <!-- Right Node -->
+    <circle cx="400" cy="200" r="20" fill="#222232" stroke="#00ADB5" stroke-width="3"/>
+    <circle cx="400" cy="200" r="8" fill="#00ADB5"/>
+    <!-- Bottom Right Node -->
+    <circle cx="380" cy="380" r="20" fill="#222232" stroke="#00CED1" stroke-width="3"/>
+    <circle cx="380" cy="380" r="8" fill="#00CED1"/>
+    <!-- Bottom Left Node -->
+    <circle cx="132" cy="380" r="20" fill="#222232" stroke="#00CED1" stroke-width="3"/>
+    <circle cx="132" cy="380" r="8" fill="#00CED1"/>
+    <!-- Left Node -->
+    <circle cx="112" cy="200" r="20" fill="#222232" stroke="#00ADB5" stroke-width="3"/>
+    <circle cx="112" cy="200" r="8" fill="#00ADB5"/>
+  </g>
+  <!-- Connection Lines -->
+  <g stroke="#00ADB540" stroke-width="2" fill="none">
+    <line x1="256" y1="120" x2="256" y2="221"/>
+    <line x1="380" y1="210" x2="291" y2="246"/>
+    <line x1="370" y1="370" x2="281" y2="276"/>
+    <line x1="142" y1="370" x2="231" y2="276"/>
+    <line x1="132" y1="210" x2="221" y2="246"/>
+  </g>
+  <!-- Active Connection Pulses -->
+  <g fill="#00ADB5">
+    <circle cx="256" cy="170" r="4">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="330" cy="225" r="4">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="310" cy="330" r="4">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="190" cy="330" r="4">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="170" cy="225" r="4">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <!-- Label -->
+  <text x="256" y="470" text-anchor="middle" font-family="Segoe UI, Arial" font-size="20" font-weight="bold" fill="#00ADB5">NETWORK</text>
+</svg>
