@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
-              xmlns:conv="clr-namespace:BhavaniSupportSuite.Converters"
+             
              mc:Ignorable="d"
              Background="#181824"
              Foreground="{StaticResource TextPrimaryBrush}">
@@ -25,7 +25,7 @@
                         <Button Content="Audit Local Users" HorizontalAlignment="Right"
                                 Command="{Binding AuditLocalUsersCommand}"
                                 Style="{StaticResource AccentButtonStyle}"
-                                IsEnabled="{Binding IsBusy, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
                     </Grid>
 
                     <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12">
@@ -60,7 +60,7 @@
                             <Button Content="Refresh" HorizontalAlignment="Right"
                                     Command="{Binding LoadServicesCommand}"
                                     Style="{StaticResource AccentButtonStyle}" FontSize="11" Padding="12,4"
-                                    IsEnabled="{Binding IsBusy, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
+                                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
                         </Grid>
 
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="8" MaxHeight="300">
@@ -114,7 +114,7 @@
                             <Button Content="Analyze" HorizontalAlignment="Right"
                                     Command="{Binding AnalyzeEventLogsCommand}"
                                     Style="{StaticResource AccentButtonStyle}" FontSize="11" Padding="12,4"
-                                    IsEnabled="{Binding IsBusy, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
+                                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
                         </Grid>
 
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="8" MaxHeight="300">

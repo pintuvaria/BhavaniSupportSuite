@@ -11,23 +11,20 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
-            MessageBox.Show($"An unexpected error occurred:\n\n{args.Exception}",
-                "Bhavani Support Suite Pro", MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Diagnostics.Debug.WriteLine($"[UI Error] {args.Exception}");
             args.Handled = true;
         };
 
         TaskScheduler.UnobservedTaskException += (_, args) =>
         {
+            System.Diagnostics.Debug.WriteLine($"[Task Error] {args.Exception}");
             args.SetObserved();
         };
 
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
         {
             if (args.ExceptionObject is Exception ex)
-            {
-                MessageBox.Show($"Fatal error:\n\n{ex}",
-                    "Bhavani Support Suite Pro", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                System.Diagnostics.Debug.WriteLine($"[Fatal] {ex}");
         };
     }
 }

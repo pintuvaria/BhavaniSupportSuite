@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
-              xmlns:conv="clr-namespace:BhavaniSupportSuite.Converters"
+             
              mc:Ignorable="d"
              Background="#181824"
              Foreground="{StaticResource TextPrimaryBrush}">
@@ -109,9 +109,9 @@
                         <TextBlock Text="One-Click First-Touch Fix" Style="{StaticResource SectionTitle}" />
                         <TextBlock Text="SFC, DISM, WinSock Reset, DNS Flush - sequential with live log." Style="{StaticResource StatusText}" Margin="0,0,0,12" />
 
-                        <ProgressBar Value="{Binding IsRepairRunning, Converter={x:Static conv:BoolToProgressConverter.Instance}}" Maximum="1" Margin="0,0,0,12" Height="4" />
+                        <ProgressBar Value="{Binding IsRepairRunning, Converter={StaticResource BoolToProgressConverter}}" Maximum="1" Margin="0,0,0,12" Height="4" />
 
-                        <Button Content="Run System Repair" Command="{Binding RunRepairCommand}" Style="{StaticResource AccentButtonStyle}" IsEnabled="{Binding IsRepairRunning, Converter={x:Static conv:InverseBoolConverter.Instance}}" HorizontalAlignment="Left" />
+                        <Button Content="Run System Repair" Command="{Binding RunRepairCommand}" Style="{StaticResource AccentButtonStyle}" IsEnabled="{Binding IsRepairRunning, Converter={StaticResource InverseBoolConverter}}" HorizontalAlignment="Left" />
 
                         <TextBlock Text="{Binding RepairStatus}" Style="{StaticResource StatusText}" Margin="0,12,0,8" />
 

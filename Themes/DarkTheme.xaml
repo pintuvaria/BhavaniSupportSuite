@@ -410,4 +410,10 @@
     <!-- Inverse Boolean to Visibility Converter -->
     <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
 
+    <!-- Value Converters -->
+    <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    <converters:BoolToProgressConverter x:Key="BoolToProgressConverter"/>
+    <converters:BoolToStatusConverter x:Key="BoolToStatusConverter"/>
+    <converters:UsbToggleConverter x:Key="UsbToggleConverter"/>
+
 </ResourceDictionary>
