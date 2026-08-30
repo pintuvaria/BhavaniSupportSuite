@@ -14,16 +14,16 @@ public partial class MainViewModel : ViewModelBase
     private readonly NetworkScanner _networkScanner;
 
     [ObservableProperty]
-    private ViewModelBase _currentView;
+    private ViewModelBase _currentView = null!;
 
     [ObservableProperty]
-    private string _selectedNavItem;
+    private string _selectedNavItem = string.Empty;
 
     [ObservableProperty]
     private bool _isSidebarExpanded;
 
     [ObservableProperty]
-    private string _systemStatus;
+    private string _systemStatus = string.Empty;
 
     [ObservableProperty]
     private float _cpuUsage;
@@ -38,7 +38,7 @@ public partial class MainViewModel : ViewModelBase
     private float _cpuTemperatureF;
 
     [ObservableProperty]
-    private string _currentTime;
+    private string _currentTime = string.Empty;
 
     [ObservableProperty]
     private bool _isWelcomeActive;
@@ -107,19 +107,26 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void Navigate(string viewName)
     {
-        CurrentView = viewName switch
+        try
         {
-            "Dashboard" => DashboardVM,
-            "Hardware" => HardwareVM,
-            "Staging" => StagingVM,
-            "Network" => NetworkVM,
-            "Security" => SecurityVM,
-            "Vault" => VaultVM,
-            "Storage" => StorageVM,
-            "Reports" => ReportsVM,
-            _ => DashboardVM
-        };
-        SelectedNavItem = viewName;
+            CurrentView = viewName switch
+            {
+                "Dashboard" => DashboardVM,
+                "Hardware" => HardwareVM,
+                "Staging" => StagingVM,
+                "Network" => NetworkVM,
+                "Security" => SecurityVM,
+                "Vault" => VaultVM,
+                "Storage" => StorageVM,
+                "Reports" => ReportsVM,
+                _ => DashboardVM
+            };
+            SelectedNavItem = viewName;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Navigate error: {ex}");
+        }
     }
 
     [RelayCommand]

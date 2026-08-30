@@ -17,7 +17,7 @@ public partial class StagingViewModel : ViewModelBase
     private bool _isInstalling;
 
     [ObservableProperty]
-    private string _installStatus;
+    private string _installStatus = string.Empty;
 
     [ObservableProperty]
     private int _progressValue;

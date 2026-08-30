@@ -18,7 +18,7 @@ public partial class UtilitiesViewModel : ViewModelBase
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusMessage;
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private string _targetUsername = string.Empty;

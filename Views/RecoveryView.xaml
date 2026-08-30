@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
              mc:Ignorable="d"
+             Background="#181824"
              Foreground="{StaticResource TextPrimaryBrush}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">

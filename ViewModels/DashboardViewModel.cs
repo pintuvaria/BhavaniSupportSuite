@@ -20,7 +20,7 @@ public partial class DashboardViewModel : ViewModelBase
     private bool _isRepairRunning;
 
     [ObservableProperty]
-    private string _repairStatus;
+    private string _repairStatus = string.Empty;
 
     [ObservableProperty]
     private float _cpuUsage;
