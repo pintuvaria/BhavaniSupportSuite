@@ -25,16 +25,16 @@ public partial class StagingViewModel : ViewModelBase
     [ObservableProperty]
     private ObservableCollection<PackageItem> _packages = new()
     {
-        new PackageItem { Name = "Google Chrome", SilentArgs = "/silent /install", IsSelected = true, Category = "Browser" },
-        new PackageItem { Name = "Mozilla Firefox", SilentArgs = "/S", IsSelected = false, Category = "Browser" },
-        new PackageItem { Name = "7-Zip", SilentArgs = "/S", IsSelected = true, Category = "Utility" },
-        new PackageItem { Name = "WinRAR", SilentArgs = "/S", IsSelected = false, Category = "Utility" },
-        new PackageItem { Name = "VS Code", SilentArgs = "/verysilent /mergetasks=!runcode", IsSelected = true, Category = "Development" },
-        new PackageItem { Name = "Notepad++", SilentArgs = "/S", IsSelected = false, Category = "Development" },
-        new PackageItem { Name = "Adobe Acrobat Reader", SilentArgs = "/S /msi EULA_ACCEPT=YES", IsSelected = false, Category = "Productivity" },
-        new PackageItem { Name = "Microsoft Teams", SilentArgs = "/s", IsSelected = false, Category = "Communication" },
-        new PackageItem { Name = "PuTTY", SilentArgs = "/S", IsSelected = false, Category = "Network" },
-        new PackageItem { Name = "FileZilla", SilentArgs = "/S", IsSelected = false, Category = "Network" },
+        new PackageItem { Name = "Google Chrome", SilentArgs = "/silent /install", WingetId = "Google.Chrome", IsSelected = true, Category = "Browser" },
+        new PackageItem { Name = "Mozilla Firefox", SilentArgs = "/S", WingetId = "Mozilla.Firefox", IsSelected = false, Category = "Browser" },
+        new PackageItem { Name = "7-Zip", SilentArgs = "/S", WingetId = "7zip.7zip", IsSelected = true, Category = "Utility" },
+        new PackageItem { Name = "WinRAR", SilentArgs = "/S", WingetId = "RARLab.WinRAR", IsSelected = false, Category = "Utility" },
+        new PackageItem { Name = "VS Code", SilentArgs = "/verysilent /mergetasks=!runcode", WingetId = "Microsoft.VisualStudioCode", IsSelected = true, Category = "Development" },
+        new PackageItem { Name = "Notepad++", SilentArgs = "/S", WingetId = "Notepad++.Notepad++", IsSelected = false, Category = "Development" },
+        new PackageItem { Name = "Adobe Acrobat Reader", SilentArgs = "/S /msi EULA_ACCEPT=YES", WingetId = "Adobe.AdobeAcrobatReader", IsSelected = false, Category = "Productivity" },
+        new PackageItem { Name = "Microsoft Teams", SilentArgs = "/s", WingetId = "Microsoft.Teams", IsSelected = false, Category = "Communication" },
+        new PackageItem { Name = "PuTTY", SilentArgs = "/S", WingetId = "PuTTY.PuTTY", IsSelected = false, Category = "Network" },
+        new PackageItem { Name = "FileZilla", SilentArgs = "/S", WingetId = "FileZilla.Client", IsSelected = false, Category = "Network" },
     };
 
     [ObservableProperty]

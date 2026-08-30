@@ -55,7 +55,9 @@ public partial class MainViewModel : ViewModelBase
         new NavItem { Icon = "\uE730", Label = "Security", ViewName = "Security" },
         new NavItem { Icon = "\uE8D1", Label = "Vault", ViewName = "Vault" },
         new NavItem { Icon = "\uE74E", Label = "Storage", ViewName = "Storage" },
-        new NavItem { Icon = "\uE774", Label = "Reports", ViewName = "Reports" }
+        new NavItem { Icon = "\uE774", Label = "Reports", ViewName = "Reports" },
+        new NavItem { Icon = "\uE74E", Label = "Recovery", ViewName = "Recovery" },
+        new NavItem { Icon = "\uE774", Label = "Utilities", ViewName = "Utilities" }
     };
 
     public DashboardViewModel DashboardVM { get; }
@@ -66,6 +68,8 @@ public partial class MainViewModel : ViewModelBase
     public VaultViewModel VaultVM { get; }
     public StorageViewModel StorageVM { get; }
     public ReportsViewModel ReportsVM { get; }
+    public RecoveryViewModel RecoveryVM { get; }
+    public UtilitiesViewModel UtilitiesVM { get; }
 
     public static IValueConverter SidebarWidthConverter { get; } = new SidebarWidthValueConverter();
     public static IValueConverter SidebarToggleConverter { get; } = new SidebarToggleValueConverter();
@@ -90,6 +94,8 @@ public partial class MainViewModel : ViewModelBase
         VaultVM = new VaultViewModel();
         StorageVM = new StorageViewModel();
         ReportsVM = new ReportsViewModel();
+        RecoveryVM = new RecoveryViewModel(_diagnosticsService);
+        UtilitiesVM = new UtilitiesViewModel(_diagnosticsService);
 
         _currentView = DashboardVM;
 
@@ -119,6 +125,8 @@ public partial class MainViewModel : ViewModelBase
                 "Vault" => VaultVM,
                 "Storage" => StorageVM,
                 "Reports" => ReportsVM,
+                "Recovery" => RecoveryVM,
+                "Utilities" => UtilitiesVM,
                 _ => DashboardVM
             };
             SelectedNavItem = viewName;
