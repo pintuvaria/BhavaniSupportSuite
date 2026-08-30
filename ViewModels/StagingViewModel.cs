@@ -58,7 +58,7 @@ public partial class StagingViewModel : ViewModelBase
     public StagingViewModel(DiagnosticsService diagnostics)
     {
         _diagnostics = diagnostics;
-        Title = "Provisioning &amp; Staging";
+        Title = "Provisioning & Staging";
         _installStatus = "Ready";
         _ = CheckDefenderStatusAsync();
     }
