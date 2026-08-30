@@ -30,6 +30,9 @@ public partial class HardwareViewModel : ViewModelBase
     private float _cpuTemperature;
 
     [ObservableProperty]
+    private float _cpuTemperatureF;
+
+    [ObservableProperty]
     private string _cpuTempStatus = "Normal";
 
     public HardwareViewModel()
@@ -110,6 +113,7 @@ public partial class HardwareViewModel : ViewModelBase
             try
             {
                 CpuTemperature = HardwareService.GetCpuTemperature();
+                CpuTemperatureF = CpuTemperature * 9f / 5f + 32f;
                 CpuTempStatus = CpuTemperature switch
                 {
                     < 50 => "Normal",

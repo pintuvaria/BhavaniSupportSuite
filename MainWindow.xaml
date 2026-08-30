@@ -261,7 +261,11 @@
                                         <Border Background="#1E1E2E" CornerRadius="8" Padding="14,6" Margin="6,0">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="TEMP " Foreground="#888888" FontSize="11" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}" Foreground="#00ADB5" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <TextBlock Foreground="#00ADB5" FontSize="13" FontWeight="Bold" VerticalAlignment="Center">
+                                                    <Run Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}"/>
+                                                    <Run Text=" / "/>
+                                                    <Run Text="{Binding CpuTemperatureF, StringFormat={}{0:F0}\u00B0F}"/>
+                                                </TextBlock>
                                             </StackPanel>
                                         </Border>
                                         <Border Background="#1E1E2E" CornerRadius="8" Padding="14,6" Margin="6,0">

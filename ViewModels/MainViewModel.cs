@@ -35,6 +35,9 @@ public partial class MainViewModel : ViewModelBase
     private float _cpuTemperature;
 
     [ObservableProperty]
+    private float _cpuTemperatureF;
+
+    [ObservableProperty]
     private string _currentTime;
 
     [ObservableProperty]
@@ -140,6 +143,7 @@ public partial class MainViewModel : ViewModelBase
                 CpuUsage = DiagnosticsService.GetCpuUsage();
                 MemoryUsage = DiagnosticsService.GetMemoryUsage();
                 CpuTemperature = DiagnosticsService.GetCpuTemperature();
+                CpuTemperatureF = CpuTemperature * 9f / 5f + 32f;
             }
             catch { }
             await Task.Delay(2000);

@@ -19,7 +19,11 @@
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="0,0,8,0">
                             <StackPanel>
                                 <TextBlock Text="CPU Temperature" Style="{StaticResource MetricLabel}" />
-                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F1}\u00B0C}" Style="{StaticResource MetricValue}" Foreground="{StaticResource AccentBrush}" Margin="0,6,0,0" />
+                                <TextBlock Style="{StaticResource MetricValue}" Foreground="{StaticResource AccentBrush}" Margin="0,6,0,0">
+                                    <Run Text="{Binding CpuTemperature, StringFormat={}{0:F1}\u00B0C}"/>
+                                    <Run Text=" / "/>
+                                    <Run Text="{Binding CpuTemperatureF, StringFormat={}{0:F1}\u00B0F}"/>
+                                </TextBlock>
                             </StackPanel>
                         </Border>
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="4,0">

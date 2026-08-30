@@ -65,7 +65,11 @@
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14" Margin="3,0">
                             <StackPanel>
                                 <TextBlock Text="CPU Temp" Style="{StaticResource StatusText}" />
-                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}" Foreground="{StaticResource AccentBrush}" FontSize="22" FontWeight="Bold" Margin="0,6,0,0" />
+                                <TextBlock Foreground="{StaticResource AccentBrush}" FontSize="22" FontWeight="Bold" Margin="0,6,0,0">
+                                    <Run Text="{Binding CpuTemperature, StringFormat={}{0:F0}\u00B0C}"/>
+                                    <Run Text=" / "/>
+                                    <Run Text="{Binding CpuTemperatureF, StringFormat={}{0:F0}\u00B0F}"/>
+                                </TextBlock>
                             </StackPanel>
                         </Border>
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14" Margin="3,0">

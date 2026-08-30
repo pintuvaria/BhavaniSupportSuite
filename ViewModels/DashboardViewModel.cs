@@ -38,6 +38,9 @@ public partial class DashboardViewModel : ViewModelBase
     private float _cpuTemperature;
 
     [ObservableProperty]
+    private float _cpuTemperatureF;
+
+    [ObservableProperty]
     private string _hostname = string.Empty;
 
     [ObservableProperty]
@@ -97,6 +100,7 @@ public partial class DashboardViewModel : ViewModelBase
                 DiskIO = DiagnosticsService.GetDiskReadBytes() / (1024 * 1024);
                 NetworkThroughput = DiagnosticsService.GetNetworkBytes() / (1024 * 1024);
                 CpuTemperature = DiagnosticsService.GetCpuTemperature();
+                CpuTemperatureF = CpuTemperature * 9f / 5f + 32f;
             }
             catch { }
             await Task.Delay(2000);
