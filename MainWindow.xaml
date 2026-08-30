@@ -276,7 +276,7 @@
                             </Border>
 
                             <!-- View Content -->
-                            <Border Grid.Row="1" Padding="28,0,28,12">
+                            <Border Grid.Row="1" Padding="28,0,28,12" Background="#181824">
                                 <ContentControl Content="{Binding CurrentView}">
                                     <ContentControl.Resources>
                                         <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView /></DataTemplate>

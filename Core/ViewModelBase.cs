@@ -25,7 +25,12 @@ public abstract class ViewModelBase : ObservableObject
         try
         {
             if (Application.Current?.Dispatcher != null)
-                Application.Current.Dispatcher.Invoke(action);
+            {
+                if (Application.Current.Dispatcher.CheckAccess())
+                    action();
+                else
+                    Application.Current.Dispatcher.BeginInvoke(action);
+            }
         }
         catch { }
     }

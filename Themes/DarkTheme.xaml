@@ -404,6 +404,12 @@
         </Setter>
     </Style>
 
+    <!-- UserControl Dark Style (ensures all views get dark background) -->
+    <Style TargetType="UserControl">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+
     <!-- Boolean to Visibility Converter -->
     <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
