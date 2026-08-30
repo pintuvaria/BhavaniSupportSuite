@@ -62,36 +62,21 @@ public partial class NetworkViewModel : ViewModelBase
 
     private void OnHostDiscovered(ScanResult host)
     {
-        try
-        {
-            if (System.Windows.Application.Current?.Dispatcher != null)
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ScanResults.Add(host));
-        }
-        catch { }
+        SafeDispatch(() => ScanResults.Add(host));
     }
 
     private void OnScanProgress(string msg)
     {
-        try
-        {
-            if (System.Windows.Application.Current?.Dispatcher != null)
-                System.Windows.Application.Current.Dispatcher.Invoke(() => ScanStatus = msg);
-        }
-        catch { }
+        SafeDispatch(() => ScanStatus = msg);
     }
 
     private void OnProgressChanged(int completed, int total)
     {
-        try
+        SafeDispatch(() =>
         {
-            if (System.Windows.Application.Current?.Dispatcher != null)
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    ScanProgress = completed;
-                    ScanTotal = total;
-                });
-        }
-        catch { }
+            ScanProgress = completed;
+            ScanTotal = total;
+        });
     }
 
     [RelayCommand]

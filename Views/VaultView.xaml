@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
              mc:Ignorable="d"
-             Foreground="{StaticResource TextPrimaryBrush}">
+             Foreground="#E0E0E0" Background="#181824">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="4">
@@ -29,7 +29,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="Destination:" VerticalAlignment="Center" Margin="0,0,8,0"
-                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                                   Foreground="#888888" />
                         <TextBox Grid.Column="1" Text="{Binding BackupDestination}" VerticalAlignment="Center" />
                         <Button Grid.Column="2" Content="Create Backup"
                                 Command="{Binding CreateBackupCommand}"
@@ -37,8 +37,7 @@
                                 IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" />
                         <Button Grid.Column="3" Content="Restore"
                                 Command="{Binding RestoreBackupCommand}"
-                                Style="{StaticResource AccentButtonStyle}" Margin="8,0,0,0"
-                                Background="{StaticResource WarningBrush}"
+                                Style="{StaticResource SuccessButtonStyle}" Margin="8,0,0,0"
                                 IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" />
                     </Grid>
 
@@ -46,15 +45,15 @@
                     <Grid Margin="0,0,0,12">
                         <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Height="4" />
                         <TextBlock HorizontalAlignment="Right" Text="{Binding StatusMessage}"
-                                   Style="{StaticResource StatusText}" Margin="0,6,0,0" />
+                                   Foreground="#888888" FontSize="12" Margin="0,6,0,0" />
                     </Grid>
 
-                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12">
+                    <Border Background="#222232" CornerRadius="8" Padding="12">
                         <DataGrid ItemsSource="{Binding Profiles}" AutoGenerateColumns="False"
-                                  Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                  Background="#222232" Foreground="#E0E0E0"
                                   BorderThickness="0" GridLinesVisibility="None"
-                                  HeadersVisibility="Column" RowBackground="{StaticResource CardBrush}"
-                                  AlternatingRowBackground="{StaticResource SurfaceBrush}"
+                                  HeadersVisibility="Column" RowBackground="#222232"
+                                  AlternatingRowBackground="#1E1E2E"
                                   CanUserAddRows="False" IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected, Mode=TwoWay}"
@@ -72,27 +71,27 @@
                 <StackPanel>
                     <TextBlock Text="Differential Backup Engine" Style="{StaticResource SectionTitle}" />
                     <TextBlock Text="Supports incremental file versioning and multi-retention restore points."
-                               Style="{StaticResource StatusText}" Margin="0,0,0,12" />
+                               Foreground="#888888" FontSize="12" Margin="0,0,0,12" />
 
                     <UniformGrid Columns="3">
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="0,0,8,0">
                             <StackPanel>
-                                <TextBlock Text="Retention Policy" Style="{StaticResource StatusText}" />
-                                <TextBlock Text="7 Days" Foreground="{StaticResource TextPrimaryBrush}"
+                                <TextBlock Text="Retention Policy" Foreground="#888888" FontSize="11" />
+                                <TextBlock Text="7 Days" Foreground="#E0E0E0"
                                            FontSize="20" FontWeight="Bold" Margin="0,6,0,0" />
                             </StackPanel>
                         </Border>
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="4,0">
                             <StackPanel>
-                                <TextBlock Text="Last Backup" Style="{StaticResource StatusText}" />
-                                <TextBlock Text="N/A" Foreground="{StaticResource TextPrimaryBrush}"
+                                <TextBlock Text="Last Backup" Foreground="#888888" FontSize="11" />
+                                <TextBlock Text="N/A" Foreground="#E0E0E0"
                                            FontSize="20" FontWeight="Bold" Margin="0,6,0,0" />
                             </StackPanel>
                         </Border>
                         <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="16" Margin="8,0,0,0">
                             <StackPanel>
-                                <TextBlock Text="Storage Used" Style="{StaticResource StatusText}" />
-                                <TextBlock Text="0 MB" Foreground="{StaticResource TextPrimaryBrush}"
+                                <TextBlock Text="Storage Used" Foreground="#888888" FontSize="11" />
+                                <TextBlock Text="0 MB" Foreground="#E0E0E0"
                                            FontSize="20" FontWeight="Bold" Margin="0,6,0,0" />
                             </StackPanel>
                         </Border>
@@ -104,12 +103,12 @@
             <Border Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,12,0,0">
                 <StackPanel>
                     <TextBlock Text="Backup Log" Style="{StaticResource SectionTitle}" />
-                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="12" MaxHeight="200">
+                    <Border Background="#222232" CornerRadius="6" Padding="12" MaxHeight="200">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding BackupLog}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" Foreground="{StaticResource TextSecondaryBrush}"
+                                        <TextBlock Text="{Binding}" Foreground="#888888"
                                                    FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,2" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

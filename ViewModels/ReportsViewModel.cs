@@ -45,7 +45,7 @@ public partial class ReportsViewModel : ViewModelBase
     public ReportsViewModel()
     {
         _diagnostics = new DiagnosticsService();
-        Title = "Reports &amp; Remote";
+        Title = "Reports & Remote";
         StatusMessage = "Ready";
         ReportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
     }

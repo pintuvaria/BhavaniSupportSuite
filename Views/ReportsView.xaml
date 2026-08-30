@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+             Background="#181824"
              Foreground="{StaticResource TextPrimaryBrush}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="4">
@@ -32,8 +33,8 @@
                         <TextBox Grid.Column="1" Text="{Binding ConnectionHost}" Width="200" />
                         <TextBlock Grid.Column="2" Text="Port:" VerticalAlignment="Center" Margin="12,0,8,0" Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBox Grid.Column="3" Text="{Binding ConnectionPort}" Width="80" />
-                        <ComboBox Grid.Column="4" Text="{Binding SelectedProtocol}" Width="80" Margin="12,0,0,0">
-                            <ComboBoxItem Content="RDP" IsSelected="True" />
+                        <ComboBox Grid.Column="4" SelectedItem="{Binding SelectedProtocol}" Width="80" Margin="12,0,0,0">
+                            <ComboBoxItem Content="RDP" />
                             <ComboBoxItem Content="SSH" />
                             <ComboBoxItem Content="VNC" />
                         </ComboBox>
@@ -44,7 +45,7 @@
                         <StackPanel Grid.Column="4" Grid.RowSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
                             <Button Content="RDP" Command="{Binding LaunchRdpCommand}" Style="{StaticResource AccentButtonStyle}" Margin="0,0,6,0" FontSize="11" Padding="12,4" />
                             <Button Content="SSH" Command="{Binding LaunchSshCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,6,0" FontSize="11" Padding="12,4" />
-                            <Button Content="VNC" Command="{Binding LaunchVncCommand}" Style="{StaticResource WarningBrush}" Foreground="White" BorderThickness="0" Height="40" Padding="12,0" FontSize="11" FontWeight="SemiBold" Cursor="Hand" />
+                            <Button Content="VNC" Command="{Binding LaunchVncCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,6,0" FontSize="11" Padding="12,4" />
                         </StackPanel>
                     </Grid>
 
