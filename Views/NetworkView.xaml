@@ -1,12 +1,9 @@
 <UserControl x:Class="BhavaniSupportSuite.Views.NetworkView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
-             mc:Ignorable="d"
+             xmlns:conv="clr-namespace:BhavaniSupportSuite.Converters"
              Background="#181824"
-             Foreground="{StaticResource TextPrimaryBrush}">
+             Foreground="#E0E0E0">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="4">
@@ -29,46 +26,38 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Subnet:" VerticalAlignment="Center" Margin="0,0,8,0"
-                                   Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBox Grid.Column="1" Text="{Binding TargetSubnet}" Width="200"
-                                 VerticalAlignment="Center" />
+                        <TextBlock Text="Subnet:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#888888" />
+                        <TextBox Grid.Column="1" Text="{Binding TargetSubnet}" Width="200" VerticalAlignment="Center" />
                         <Button Grid.Column="2" Content="Start Scan"
                                 Command="{Binding StartSubnetScanCommand}"
                                 Style="{StaticResource AccentButtonStyle}" Margin="12,0,0,0"
-                                IsEnabled="{Binding IsScanning, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                                IsEnabled="{Binding IsScanning, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
                         <Button Grid.Column="3" Content="Stop"
                                 Command="{Binding StopScanCommand}"
-                                Background="{StaticResource DangerBrush}" Foreground="White"
-                                BorderThickness="0" Height="40" Padding="16,0" Margin="8,0,0,0" Cursor="Hand"
+                                Style="{StaticResource DangerButtonStyle}" Margin="8,0,0,0"
                                 IsEnabled="{Binding IsScanning}" />
                     </Grid>
 
-                    <!-- Progress -->
                     <Grid Margin="0,0,0,12">
-                        <ProgressBar Value="{Binding ScanProgress}" Maximum="{Binding ScanTotal}" Height="4" />
+                        <ProgressBar Value="{Binding ScanProgress}" Maximum="100" Height="4" />
                         <TextBlock HorizontalAlignment="Right" Text="{Binding ScanStatus}"
                                    Style="{StaticResource StatusText}" Margin="0,6,0,0" />
                     </Grid>
 
-                    <!-- Scan Results -->
-                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12" MaxHeight="300">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <DataGrid ItemsSource="{Binding ScanResults}" AutoGenerateColumns="False"
-                                      Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
-                                      BorderThickness="0" GridLinesVisibility="None"
-                                      HeadersVisibility="Column" RowBackground="{StaticResource CardBrush}"
-                                      AlternatingRowBackground="{StaticResource SurfaceBrush}"
-                                      CanUserAddRows="False" IsReadOnly="True"
-                                      SelectedItem="{Binding SelectedHost}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="IP Address" Binding="{Binding IpAddress}" Width="130" />
-                                    <DataGridTextColumn Header="Hostname" Binding="{Binding HostName}" Width="*" />
-                                    <DataGridTextColumn Header="MAC Address" Binding="{Binding MacAddress}" Width="150" />
-                                    <DataGridTextColumn Header="Response" Binding="{Binding ResponseTimeMs}" Width="80" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </ScrollViewer>
+                    <Border Background="#222232" CornerRadius="8" Padding="12" MaxHeight="300">
+                        <DataGrid ItemsSource="{Binding ScanResults}" AutoGenerateColumns="False"
+                                  Background="#222232" Foreground="#E0E0E0"
+                                  BorderThickness="0" GridLinesVisibility="None"
+                                  HeadersVisibility="Column" RowBackground="#222232"
+                                  AlternatingRowBackground="#1E1E2E"
+                                  CanUserAddRows="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="IP Address" Binding="{Binding IpAddress}" Width="130" />
+                                <DataGridTextColumn Header="Hostname" Binding="{Binding HostName}" Width="*" />
+                                <DataGridTextColumn Header="MAC Address" Binding="{Binding MacAddress}" Width="150" />
+                                <DataGridTextColumn Header="Response" Binding="{Binding ResponseTimeMs}" Width="80" />
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Border>
                 </StackPanel>
             </Border>
@@ -85,14 +74,12 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Target IP:" VerticalAlignment="Center" Margin="0,0,8,0"
-                                   Foreground="{StaticResource TextSecondaryBrush}" />
-                        <TextBox Grid.Column="1" Text="{Binding TargetIp}" Width="200"
-                                 VerticalAlignment="Center" />
+                        <TextBlock Text="Target IP:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#888888" />
+                        <TextBox Grid.Column="1" Text="{Binding TargetIp}" Width="200" VerticalAlignment="Center" />
                         <Button Grid.Column="2" Content="Scan Ports"
                                 Command="{Binding ScanPortsCommand}"
                                 Style="{StaticResource AccentButtonStyle}" Margin="12,0,0,0"
-                                IsEnabled="{Binding IsScanning, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                                IsEnabled="{Binding IsScanning, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
                     </Grid>
 
                     <Grid Margin="0,0,0,12">
@@ -100,26 +87,23 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Ports:" VerticalAlignment="Center" Margin="0,0,8,0"
-                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Ports:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#888888" />
                         <TextBox Grid.Column="1" Text="{Binding PortRange}" Width="*" />
                     </Grid>
 
-                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12" MaxHeight="250">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <DataGrid ItemsSource="{Binding PortResults}" AutoGenerateColumns="False"
-                                      Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
-                                      BorderThickness="0" GridLinesVisibility="None"
-                                      HeadersVisibility="Column" RowBackground="{StaticResource CardBrush}"
-                                      AlternatingRowBackground="{StaticResource SurfaceBrush}"
-                                      CanUserAddRows="False" IsReadOnly="True">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Port" Binding="{Binding Port}" Width="80" />
-                                    <DataGridTextColumn Header="Service" Binding="{Binding ServiceName}" Width="*" />
-                                    <DataGridTextColumn Header="State" Binding="{Binding State}" Width="150" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </ScrollViewer>
+                    <Border Background="#222232" CornerRadius="8" Padding="12" MaxHeight="250">
+                        <DataGrid ItemsSource="{Binding PortResults}" AutoGenerateColumns="False"
+                                  Background="#222232" Foreground="#E0E0E0"
+                                  BorderThickness="0" GridLinesVisibility="None"
+                                  HeadersVisibility="Column" RowBackground="#222232"
+                                  AlternatingRowBackground="#1E1E2E"
+                                  CanUserAddRows="False" IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Port" Binding="{Binding Port}" Width="80" />
+                                <DataGridTextColumn Header="Service" Binding="{Binding ServiceName}" Width="*" />
+                                <DataGridTextColumn Header="State" Binding="{Binding State}" Width="150" />
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Border>
                 </StackPanel>
             </Border>
@@ -131,21 +115,18 @@
                         <TextBlock Text="DHCP &amp; VLAN Diagnostic" Style="{StaticResource SectionTitle}" />
                         <Button Content="Load Network Info" HorizontalAlignment="Right"
                                 Command="{Binding LoadNetworkInfoCommand}"
-                                Style="{StaticResource AccentButtonStyle}"
-                                IsEnabled="{Binding IsScanning, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                                Style="{StaticResource AccentButtonStyle}" />
                     </Grid>
 
-                    <Border Background="{StaticResource SurfaceBrush}" CornerRadius="6" Padding="12" MaxHeight="200">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding NetworkInfo}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}" Foreground="{StaticResource TextSecondaryBrush}"
-                                                   FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,2" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                    <Border Background="#222232" CornerRadius="6" Padding="12" MaxHeight="200">
+                        <ItemsControl ItemsSource="{Binding NetworkInfo}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Foreground="#888888"
+                                               FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Margin="0,2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Border>
                 </StackPanel>
             </Border>

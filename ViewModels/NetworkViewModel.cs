@@ -54,29 +54,6 @@ public partial class NetworkViewModel : ViewModelBase
         _diagnostics = diagnostics;
         Title = "Network Scanner";
         _scanStatus = "Ready";
-
-        _scanner.HostDiscovered += OnHostDiscovered;
-        _scanner.ScanProgress += OnScanProgress;
-        _scanner.ProgressChanged += OnProgressChanged;
-    }
-
-    private void OnHostDiscovered(ScanResult host)
-    {
-        SafeDispatch(() => ScanResults.Add(host));
-    }
-
-    private void OnScanProgress(string msg)
-    {
-        SafeDispatch(() => ScanStatus = msg);
-    }
-
-    private void OnProgressChanged(int completed, int total)
-    {
-        SafeDispatch(() =>
-        {
-            ScanProgress = completed;
-            ScanTotal = total;
-        });
     }
 
     [RelayCommand]
@@ -91,8 +68,13 @@ public partial class NetworkViewModel : ViewModelBase
         try
         {
             _scanCts = new CancellationTokenSource();
-            await _scanner.ScanSubnetAsync(TargetSubnet, _scanCts.Token);
-            ScanStatus = $"Scan complete. Found {ScanResults.Count} hosts.";
+            var results = await _scanner.ScanSubnetAsync(TargetSubnet, _scanCts.Token);
+            SafeDispatch(() =>
+            {
+                foreach (var r in results)
+                    ScanResults.Add(r);
+            });
+            ScanStatus = $"Scan complete. Found {results.Count} hosts.";
         }
         catch (OperationCanceledException) { ScanStatus = "Scan cancelled."; }
         catch (Exception ex) { ScanStatus = $"Error: {ex.Message}"; }
@@ -123,7 +105,8 @@ public partial class NetworkViewModel : ViewModelBase
                 .Select(p => int.TryParse(p, out var port) ? port : 0).Where(p => p > 0).ToArray();
 
             var results = await _scanner.ScanPortsAsync(TargetIp, ports);
-            PortResults = new ObservableCollection<PortScanResult>(results);
+            var collection = new ObservableCollection<PortScanResult>(results);
+            SafeDispatch(() => PortResults = collection);
 
             var openPorts = results.Count(r => r.IsOpen);
             ScanStatus = $"Port scan complete. {openPorts}/{ports.Length} ports open.";
@@ -145,7 +128,8 @@ public partial class NetworkViewModel : ViewModelBase
         try
         {
             var conflicts = await _scanner.DetectIpConflictsAsync(TargetSubnet);
-            IpConflicts = new ObservableCollection<IpConflictResult>(conflicts);
+            var collection = new ObservableCollection<IpConflictResult>(conflicts);
+            SafeDispatch(() => IpConflicts = collection);
             ScanStatus = $"Conflict detection complete. {conflicts.Count} conflicts found.";
         }
         catch (Exception ex) { ScanStatus = $"Error: {ex.Message}"; }
@@ -158,12 +142,16 @@ public partial class NetworkViewModel : ViewModelBase
     {
         IsScanning = true;
         ScanStatus = "Loading network information...";
-        NetworkInfo.Clear();
 
-        var info = await NetworkScanner.GetNetworkInfoAsync();
-        foreach (var line in info) NetworkInfo.Add(line);
+        try
+        {
+            var info = await NetworkScanner.GetNetworkInfoAsync();
+            var lines = new ObservableCollection<string>(info);
+            SafeDispatch(() => NetworkInfo = lines);
+            ScanStatus = "Network information loaded.";
+        }
+        catch (Exception ex) { ScanStatus = $"Error: {ex.Message}"; }
 
-        ScanStatus = "Network information loaded.";
         IsScanning = false;
     }
 

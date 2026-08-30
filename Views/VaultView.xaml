@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+              xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+              xmlns:conv="clr-namespace:BhavaniSupportSuite.Converters"
              mc:Ignorable="d"
              Foreground="#E0E0E0" Background="#181824">
 
@@ -34,11 +35,11 @@
                         <Button Grid.Column="2" Content="Create Backup"
                                 Command="{Binding CreateBackupCommand}"
                                 Style="{StaticResource AccentButtonStyle}" Margin="12,0,0,0"
-                                IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                                IsEnabled="{Binding IsBusy, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
                         <Button Grid.Column="3" Content="Restore"
                                 Command="{Binding RestoreBackupCommand}"
                                 Style="{StaticResource SuccessButtonStyle}" Margin="8,0,0,0"
-                                IsEnabled="{Binding IsBusy, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                                IsEnabled="{Binding IsBusy, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
                     </Grid>
 
                     <!-- Progress -->

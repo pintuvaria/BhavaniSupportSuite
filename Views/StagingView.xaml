@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+              xmlns:views="clr-namespace:BhavaniSupportSuite.Views"
+              xmlns:conv="clr-namespace:BhavaniSupportSuite.Converters"
              mc:Ignorable="d"
              Background="#181824"
              Foreground="{StaticResource TextPrimaryBrush}">
@@ -34,7 +35,7 @@
                             <Button Content="Install Selected Packages"
                                     Command="{Binding InstallSelectedCommand}"
                                     Style="{StaticResource AccentButtonStyle}"
-                                    IsEnabled="{Binding IsInstalling, Converter={x:Static views:InverseBoolConverter.Instance}}" />
+                                    IsEnabled="{Binding IsInstalling, Converter={x:Static conv:InverseBoolConverter.Instance}}" />
                             <Button Content="Cancel" Margin="8,0,0,0" Style="{StaticResource AccentButtonStyle}"
                                     Background="{StaticResource DangerBrush}" />
                         </StackPanel>
@@ -70,7 +71,7 @@
                     <Button Content="Apply Selected Registry Tweaks"
                             Command="{Binding ApplyRegistryTweaksCommand}"
                             Style="{StaticResource AccentButtonStyle}"
-                            IsEnabled="{Binding IsInstalling, Converter={x:Static views:InverseBoolConverter.Instance}}"
+                            IsEnabled="{Binding IsInstalling, Converter={x:Static conv:InverseBoolConverter.Instance}}"
                             HorizontalAlignment="Left" Margin="0,0,0,12" />
 
                     <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="12">
