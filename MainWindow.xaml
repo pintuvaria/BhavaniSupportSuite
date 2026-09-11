@@ -17,10 +17,6 @@
         Icon="Resources/AppIcon.ico"
         Closing="Window_Closing">
 
-    <Window.DataContext>
-        <vm:MainViewModel />
-    </Window.DataContext>
-
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0" GlassFrameThickness="0" ResizeBorderThickness="8" CornerRadius="0" />
     </WindowChrome.WindowChrome>

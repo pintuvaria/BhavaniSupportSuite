@@ -42,9 +42,9 @@ public partial class ReportsViewModel : ViewModelBase
     [ObservableProperty]
     private string _reportPath = string.Empty;
 
-    public ReportsViewModel()
+    public ReportsViewModel(DiagnosticsService diagnostics)
     {
-        _diagnostics = new DiagnosticsService();
+        _diagnostics = diagnostics;
         Title = "Reports & Remote";
         StatusMessage = "Ready";
         ReportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

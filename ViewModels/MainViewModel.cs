@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
 using BhavaniSupportSuite.Services;
+using Serilog;
 
 namespace BhavaniSupportSuite.ViewModels;
 
@@ -74,30 +75,40 @@ public partial class MainViewModel : ViewModelBase
     public static IValueConverter SidebarWidthConverter { get; } = new SidebarWidthValueConverter();
     public static IValueConverter SidebarToggleConverter { get; } = new SidebarToggleValueConverter();
 
-    public MainViewModel()
+    public MainViewModel(
+        DiagnosticsService diagnosticsService,
+        NetworkScanner networkScanner,
+        DashboardViewModel dashboardVM,
+        HardwareViewModel hardwareVM,
+        StagingViewModel stagingVM,
+        NetworkViewModel networkVM,
+        SecurityViewModel securityVM,
+        VaultViewModel vaultVM,
+        StorageViewModel storageVM,
+        ReportsViewModel reportsVM,
+        RecoveryViewModel recoveryVM,
+        UtilitiesViewModel utilitiesVM)
     {
-        _diagnosticsService = new DiagnosticsService();
-        _networkScanner = new NetworkScanner();
-        _currentView = null!;
+        _diagnosticsService = diagnosticsService;
+        _networkScanner = networkScanner;
+        DashboardVM = dashboardVM;
+        HardwareVM = hardwareVM;
+        StagingVM = stagingVM;
+        NetworkVM = networkVM;
+        SecurityVM = securityVM;
+        VaultVM = vaultVM;
+        StorageVM = storageVM;
+        ReportsVM = reportsVM;
+        RecoveryVM = recoveryVM;
+        UtilitiesVM = utilitiesVM;
+
+        _currentView = DashboardVM;
         _selectedNavItem = "Dashboard";
-        _isSidebarExpanded = true;
+        _isSidebarExpanded = App.Settings?.IsSidebarExpanded ?? true;
         _systemStatus = "Ready";
         _currentTime = DateTime.Now.ToString("HH:mm:ss");
         _isWelcomeActive = true;
         _isGoodbyeActive = false;
-
-        DashboardVM = new DashboardViewModel(_diagnosticsService);
-        HardwareVM = new HardwareViewModel();
-        StagingVM = new StagingViewModel(_diagnosticsService);
-        NetworkVM = new NetworkViewModel(_networkScanner, _diagnosticsService);
-        SecurityVM = new SecurityViewModel(_diagnosticsService);
-        VaultVM = new VaultViewModel();
-        StorageVM = new StorageViewModel();
-        ReportsVM = new ReportsViewModel();
-        RecoveryVM = new RecoveryViewModel(_diagnosticsService);
-        UtilitiesVM = new UtilitiesViewModel(_diagnosticsService);
-
-        _currentView = DashboardVM;
 
         _ = StartPerformanceCountersAsync();
         _ = UpdateClockAsync();
@@ -133,7 +144,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Navigate error: {ex}");
+            Log.Error(ex, "Navigation error to {View}", viewName);
         }
     }
 
@@ -161,7 +172,7 @@ public partial class MainViewModel : ViewModelBase
                 CpuTemperatureF = CpuTemperature * 9f / 5f + 32f;
             }
             catch { }
-            await Task.Delay(2000);
+            await Task.Delay(App.Settings?.RefreshIntervalSeconds * 1000 ?? 2000);
         }
     }
 
