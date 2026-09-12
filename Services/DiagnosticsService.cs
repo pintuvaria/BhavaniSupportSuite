@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Text;
+using BhavaniSupportSuite.Core;
+using Serilog;
 
 namespace BhavaniSupportSuite.Services;
 
@@ -11,8 +13,12 @@ public class DiagnosticsService
 
     public async Task<int> RunCommandAsync(string fileName, string arguments, CancellationToken cancellationToken = default)
     {
+        // Sanitize arguments to prevent command injection
+        var sanitizedArgs = SecurityUtilities.SanitizeArgument(arguments);
+        var sanitizedFile = SecurityUtilities.SanitizePath(fileName);
+        
         var tcs = new TaskCompletionSource<int>();
-        var process = CreateProcess(fileName, arguments);
+        var process = CreateProcess(sanitizedFile, sanitizedArgs);
 
         process.OutputDataReceived += (_, e) => { if (e.Data is not null) OutputReceived?.Invoke(e.Data); };
         process.ErrorDataReceived += (_, e) => { if (e.Data is not null) ErrorReceived?.Invoke(e.Data); };
@@ -20,7 +26,15 @@ public class DiagnosticsService
 
         try
         {
-            cancellationToken.Register(() => { try { process.Kill(); } catch { } tcs.TrySetCanceled(cancellationToken); });
+            cancellationToken.Register(() => 
+            { 
+                try { process.Kill(); } 
+                catch (Exception ex) 
+                { 
+                    Log.Error(ex, "Failed to kill process on cancellation"); 
+                } 
+                tcs.TrySetCanceled(cancellationToken); 
+            });
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -28,6 +42,7 @@ public class DiagnosticsService
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Failed to start process: {FileName} {Arguments}", sanitizedFile, sanitizedArgs);
             ErrorReceived?.Invoke($"Failed to start process: {ex.Message}");
             return -1;
         }
@@ -35,9 +50,13 @@ public class DiagnosticsService
 
     public async Task<string> RunCommandCapturedAsync(string fileName, string arguments, CancellationToken cancellationToken = default)
     {
+        // Sanitize arguments to prevent command injection
+        var sanitizedArgs = SecurityUtilities.SanitizeArgument(arguments);
+        var sanitizedFile = SecurityUtilities.SanitizePath(fileName);
+        
         var output = new StringBuilder();
         var tcs = new TaskCompletionSource<int>();
-        var process = CreateProcess(fileName, arguments);
+        var process = CreateProcess(sanitizedFile, sanitizedArgs);
 
         process.OutputDataReceived += (_, e) => { if (e.Data is not null) { output.AppendLine(e.Data); OutputReceived?.Invoke(e.Data); } };
         process.ErrorDataReceived += (_, e) => { if (e.Data is not null) ErrorReceived?.Invoke(e.Data); };
@@ -45,14 +64,26 @@ public class DiagnosticsService
 
         try
         {
-            cancellationToken.Register(() => { try { process.Kill(); } catch { } tcs.TrySetCanceled(cancellationToken); });
+            cancellationToken.Register(() => 
+            { 
+                try { process.Kill(); } 
+                catch (Exception ex) 
+                { 
+                    Log.Error(ex, "Failed to kill process on cancellation"); 
+                } 
+                tcs.TrySetCanceled(cancellationToken); 
+            });
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             await tcs.Task;
             return output.ToString();
         }
-        catch (Exception ex) { return $"Error: {ex.Message}"; }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Process execution failed: {FileName} {Arguments}", sanitizedFile, sanitizedArgs);
+            return $"Error: {ex.Message}";
+        }
     }
 
     public static async Task<List<string>> GetSystemInfoAsync()
@@ -105,7 +136,11 @@ public class DiagnosticsService
                     break;
                 }
         }
-        catch { info.Add("Unable to retrieve full system info."); }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to retrieve system info");
+            info.Add("Unable to retrieve full system info.");
+        }
         return await Task.FromResult(info);
     }
 
@@ -116,25 +151,41 @@ public class DiagnosticsService
             using var c = new PerformanceCounter("Processor", "% Processor Time", "_Total");
             c.NextValue(); Thread.Sleep(100); return c.NextValue();
         }
-        catch { return 0f; }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get CPU usage");
+            return 0f;
+        }
     }
 
     public static float GetMemoryUsage()
     {
         try { using var c = new PerformanceCounter("Memory", "% Committed Bytes In Use"); return c.NextValue(); }
-        catch { return 0f; }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get memory usage");
+            return 0f;
+        }
     }
 
     public static float GetDiskReadBytes()
     {
         try { using var c = new PerformanceCounter("PhysicalDisk", "Disk Read Bytes/sec", "_Total"); return c.NextValue(); }
-        catch { return 0f; }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get disk read bytes");
+            return 0f;
+        }
     }
 
     public static float GetDiskWriteBytes()
     {
         try { using var c = new PerformanceCounter("PhysicalDisk", "Disk Write Bytes/sec", "_Total"); return c.NextValue(); }
-        catch { return 0f; }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get disk write bytes");
+            return 0f;
+        }
     }
 
     public static float GetNetworkBytes()
@@ -169,7 +220,10 @@ public class DiagnosticsService
                 return (rawTemp - 2732) / 10.0f;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get CPU temperature");
+        }
         return 0f;
     }
 
@@ -190,7 +244,11 @@ public class DiagnosticsService
                 info.Add(string.Empty);
             }
         }
-        catch { info.Add("Unable to retrieve disk health info."); }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to retrieve disk health info");
+            info.Add("Unable to retrieve disk health info.");
+        }
         return info;
     }
 
@@ -209,7 +267,11 @@ public class DiagnosticsService
             }
             if (info.Count == 0) info.Add("No battery detected (Desktop system).");
         }
-        catch { info.Add("Unable to retrieve battery info."); }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to retrieve battery info");
+            info.Add("Unable to retrieve battery info.");
+        }
         return info;
     }
 
@@ -234,7 +296,10 @@ public class DiagnosticsService
                         foreach (var name in key.GetValueNames())
                             items.Add($"[{keyPath.Split('\\').Last()}] {name} = {key.GetValue(name)}");
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Failed to read registry key: {KeyPath}", keyPath);
+                }
             }
 
             try
@@ -244,9 +309,16 @@ public class DiagnosticsService
                     foreach (var name in userKey.GetValueNames())
                         items.Add($"[HKCU\\Run] {name} = {userKey.GetValue(name)}");
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to read HKCU Run key");
+            }
         }
-        catch { items.Add("Unable to retrieve startup items."); }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to retrieve startup items");
+            items.Add("Unable to retrieve startup items.");
+        }
         return await Task.FromResult(items);
     }
 
@@ -259,7 +331,11 @@ public class DiagnosticsService
             foreach (var obj in searcher.Get())
                 devices.Add($"{obj["DeviceID"]} - {obj["Name"]}");
         }
-        catch { devices.Add("Unable to enumerate USB devices."); }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to enumerate USB devices");
+            devices.Add("Unable to enumerate USB devices.");
+        }
         return devices;
     }
 

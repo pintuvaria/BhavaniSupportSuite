@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Security.Cryptography;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
+using Serilog;
 
 namespace BhavaniSupportSuite.ViewModels;
 
@@ -38,7 +40,16 @@ public partial class VaultViewModel : ViewModelBase
     {
         Title = "System Vault";
         StatusMessage = "Ready";
-        BackupDestination = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BhavaniBackup");
+        BackupDestination = App.Settings?.BackupDestination ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BhavaniBackup");
+    }
+
+    partial void OnBackupDestinationChanged(string value)
+    {
+        if (App.Settings != null)
+        {
+            App.Settings.BackupDestination = value;
+            SettingsService.Save(App.Settings);
+        }
     }
 
     [RelayCommand]
@@ -62,7 +73,9 @@ public partial class VaultViewModel : ViewModelBase
             Directory.CreateDirectory(backupDir);
             BackupLog.Add($"Backup directory: {backupDir}");
 
+            var manifest = new List<BackupManifestEntry>();
             var completed = 0;
+
             foreach (var profile in selected)
             {
                 StatusMessage = $"Backing up: {profile.Name}...";
@@ -73,6 +86,21 @@ public partial class VaultViewModel : ViewModelBase
                     var regFile = Path.Combine(backupDir, $"{profile.Name.Replace(" ", "_")}.reg");
                     var exitCode = await RunProcessAsync("reg", $"export \"{profile.Path}\" \"{regFile}\" /y");
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Registry export: exit code {exitCode}");
+                    
+                    if (exitCode == 0 && File.Exists(regFile))
+                    {
+                        var checksum = SecurityUtilities.ComputeSha256(regFile);
+                        manifest.Add(new BackupManifestEntry
+                        {
+                            Name = profile.Name,
+                            Type = "Registry",
+                            SourcePath = profile.Path,
+                            BackupPath = regFile,
+                            SizeBytes = new FileInfo(regFile).Length,
+                            Sha256 = checksum,
+                            Timestamp = DateTime.UtcNow
+                        });
+                    }
                 }
                 else if (File.Exists(profile.Path))
                 {
@@ -80,6 +108,21 @@ public partial class VaultViewModel : ViewModelBase
                     var destFile = Path.Combine(backupDir, Path.GetFileName(profile.Path));
                     await Task.Run(() => File.Copy(profile.Path, destFile, true));
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] File copied: {destFile}");
+
+                    if (File.Exists(destFile))
+                    {
+                        var checksum = SecurityUtilities.ComputeSha256(destFile);
+                        manifest.Add(new BackupManifestEntry
+                        {
+                            Name = profile.Name,
+                            Type = "File",
+                            SourcePath = profile.Path,
+                            BackupPath = destFile,
+                            SizeBytes = new FileInfo(destFile).Length,
+                            Sha256 = checksum,
+                            Timestamp = DateTime.UtcNow
+                        });
+                    }
                 }
                 else if (Directory.Exists(profile.Path))
                 {
@@ -87,6 +130,24 @@ public partial class VaultViewModel : ViewModelBase
                     var destDir = Path.Combine(backupDir, profile.Name.Replace(" ", "_"));
                     await Task.Run(() => CopyDirectory(profile.Path, destDir));
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Directory copied: {destDir}");
+
+                    // Compute checksums for all files in directory
+                    var dirFiles = Directory.GetFiles(destDir, "*", SearchOption.AllDirectories);
+                    foreach (var file in dirFiles)
+                    {
+                        var relativePath = file.Substring(destDir.Length + 1);
+                        var checksum = SecurityUtilities.ComputeSha256(file);
+                        manifest.Add(new BackupManifestEntry
+                        {
+                            Name = $"{profile.Name}/{relativePath}",
+                            Type = "Directory File",
+                            SourcePath = profile.Path,
+                            BackupPath = file,
+                            SizeBytes = new FileInfo(file).Length,
+                            Sha256 = checksum,
+                            Timestamp = DateTime.UtcNow
+                        });
+                    }
                 }
                 else
                 {
@@ -97,13 +158,83 @@ public partial class VaultViewModel : ViewModelBase
                 ProgressValue = (int)((completed / (double)selected.Count) * 100);
             }
 
+            // Save manifest with checksums
+            var manifestPath = Path.Combine(backupDir, "manifest.json");
+            var manifestJson = System.Text.Json.JsonSerializer.Serialize(manifest, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(manifestPath, manifestJson);
+            BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Manifest saved with {manifest.Count} entries.");
+
             BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Backup completed successfully.");
             StatusMessage = $"Backup created at: {backupDir}";
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Backup failed");
             BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Error: {ex.Message}");
             StatusMessage = $"Backup failed: {ex.Message}";
+        }
+
+        IsBusy = false;
+    }
+
+    [RelayCommand]
+    private async Task VerifyBackupAsync()
+    {
+        if (IsBusy) return;
+        
+        // Simple file dialog to select backup directory
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Manifest files (*.json)|*.json",
+            Title = "Select backup manifest to verify"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        IsBusy = true;
+        StatusMessage = "Verifying backup integrity...";
+        BackupLog.Clear();
+
+        try
+        {
+            var manifestJson = await File.ReadAllTextAsync(dialog.FileName);
+            var manifest = System.Text.Json.JsonSerializer.Deserialize<List<BackupManifestEntry>>(manifestJson) ?? new List<BackupManifestEntry>();
+            var backupDir = Path.GetDirectoryName(dialog.FileName)!;
+
+            int verified = 0, failed = 0, missing = 0;
+
+            foreach (var entry in manifest)
+            {
+                var fullPath = Path.Combine(backupDir, Path.GetFileName(entry.BackupPath));
+                
+                if (!File.Exists(fullPath))
+                {
+                    BackupLog.Add($"[MISSING] {entry.Name}");
+                    missing++;
+                    continue;
+                }
+
+                var actualChecksum = SecurityUtilities.ComputeSha256(fullPath);
+                if (string.Equals(actualChecksum, entry.Sha256, StringComparison.OrdinalIgnoreCase))
+                {
+                    BackupLog.Add($"[OK] {entry.Name}");
+                    verified++;
+                }
+                else
+                {
+                    BackupLog.Add($"[MISMATCH] {entry.Name} (expected: {entry.Sha256}, got: {actualChecksum})");
+                    failed++;
+                }
+            }
+
+            BackupLog.Add($"Verification complete: {verified} OK, {failed} mismatched, {missing} missing.");
+            StatusMessage = $"Verification complete: {verified} OK, {failed} failed, {missing} missing";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Backup verification failed");
+            BackupLog.Add($"Error: {ex.Message}");
+            StatusMessage = "Verification failed";
         }
 
         IsBusy = false;
@@ -136,9 +267,12 @@ public partial class VaultViewModel : ViewModelBase
         {
             StartInfo = new System.Diagnostics.ProcessStartInfo
             {
-                FileName = fileName, Arguments = arguments,
-                UseShellExecute = false, CreateNoWindow = true,
-                RedirectStandardOutput = true, RedirectStandardError = true
+                FileName = fileName, 
+                Arguments = arguments,
+                UseShellExecute = false, 
+                CreateNoWindow = true,
+                RedirectStandardOutput = true, 
+                RedirectStandardError = true
             }
         };
         process.Start();
@@ -153,4 +287,15 @@ public class BackupProfile
     public string Path { get; set; } = string.Empty;
     public bool IsSelected { get; set; }
     public bool IsRegistry { get; set; }
+}
+
+public class BackupManifestEntry
+{
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string SourcePath { get; set; } = string.Empty;
+    public string BackupPath { get; set; } = string.Empty;
+    public long SizeBytes { get; set; }
+    public string Sha256 { get; set; } = string.Empty;
+    public DateTime Timestamp { get; set; }
 }

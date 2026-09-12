@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using BhavaniSupportSuite.Core;
 using BhavaniSupportSuite.Services;
@@ -57,8 +56,24 @@ public class AppSettings
     public string LastUsedSubnet { get; set; } = "192.168.1.0/24";
     public string LastTargetIp { get; set; } = "192.168.1.1";
     public string LastPortRange { get; set; } = "22,80,135,445,3389,8080";
-    public string BackupDestination { get; set; } = string.Empty;
-    public string ReportPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    
+    // Encrypted sensitive paths
+    private string _backupDestination = string.Empty;
+    private string _reportPath = string.Empty;
+    
+    public string BackupDestination 
+    { 
+        get => SecurityUtilities.Unprotect(_backupDestination); 
+        set => _backupDestination = SecurityUtilities.Protect(value); 
+    }
+    
+    public string ReportPath 
+    { 
+        get => SecurityUtilities.Unprotect(_reportPath); 
+        set => _reportPath = SecurityUtilities.Protect(value); 
+    }
+    
+    // Non-sensitive settings
     public bool IsSidebarExpanded { get; set; } = true;
     public double WindowWidth { get; set; } = 1400;
     public double WindowHeight { get; set; } = 800;
@@ -68,6 +83,14 @@ public class AppSettings
     public int DeepCleanRetentionDays { get; set; } = 30;
     public bool AutoRefreshEnabled { get; set; } = true;
     public int RefreshIntervalSeconds { get; set; } = 2;
+    
+    // Initialize default paths
+    public AppSettings()
+    {
+        _backupDestination = SecurityUtilities.Protect(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BhavaniBackup"));
+        _reportPath = SecurityUtilities.Protect(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+    }
 }
 
 public static class SettingsService
@@ -84,11 +107,14 @@ public static class SettingsService
             if (File.Exists(SettingsPath))
             {
                 var json = File.ReadAllText(SettingsPath);
-                var settings = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json);
+                var settings = JsonSerializer.Deserialize<AppSettings>(json);
                 return settings ?? new AppSettings();
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to load settings");
+        }
         return new AppSettings();
     }
 
@@ -99,10 +125,13 @@ public static class SettingsService
             var dir = Path.GetDirectoryName(SettingsPath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir!);
 
-            var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
-            var json = System.Text.Json.JsonSerializer.Serialize(settings, options);
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var json = JsonSerializer.Serialize(settings, options);
             File.WriteAllText(SettingsPath, json);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to save settings");
+        }
     }
 }

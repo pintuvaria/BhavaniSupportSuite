@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
 using BhavaniSupportSuite.Services;
+using Serilog;
 
 namespace BhavaniSupportSuite.ViewModels;
 
@@ -47,7 +48,16 @@ public partial class ReportsViewModel : ViewModelBase
         _diagnostics = diagnostics;
         Title = "Reports & Remote";
         StatusMessage = "Ready";
-        ReportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        ReportPath = App.Settings?.ReportPath ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    }
+
+    partial void OnReportPathChanged(string value)
+    {
+        if (App.Settings != null)
+        {
+            App.Settings.ReportPath = value;
+            SettingsService.Save(App.Settings);
+        }
     }
 
     [RelayCommand]
@@ -112,6 +122,7 @@ public partial class ReportsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Failed to generate report");
             StatusMessage = $"Error: {ex.Message}";
         }
 
