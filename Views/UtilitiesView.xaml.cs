@@ -14,7 +14,7 @@ public partial class UtilitiesView : UserControl
     {
         if (DataContext is ViewModels.UtilitiesViewModel vm)
         {
-            vm.NewPassword = PasswordInput.Password;
+            vm.NewPasswordString = PasswordInput.Password;
         }
     }
 }

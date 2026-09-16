@@ -1,14 +1,19 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
 using BhavaniSupportSuite.Services;
+using Serilog;
 
 namespace BhavaniSupportSuite.ViewModels;
 
 public partial class StagingViewModel : ViewModelBase
 {
     private readonly DiagnosticsService _diagnostics;
+    private CancellationTokenSource? _cancellationTokenSource;
+    private Action<string>? _outputHandler;
+    private Action<string>? _errorHandler;
 
     [ObservableProperty]
     private ObservableCollection<string> _installLog = new();
@@ -81,28 +86,84 @@ public partial class StagingViewModel : ViewModelBase
         var selected = Packages.Where(p => p.IsSelected).ToList();
         if (!selected.Any()) { InstallStatus = "No packages selected."; return; }
 
+        // Validate all WingetIds before starting
+        foreach (var pkg in selected)
+        {
+            if (!SecurityUtilities.IsSafeArgument(pkg.WingetId) || !SecurityUtilities.IsSafeArgument(pkg.SilentArgs))
+            {
+                InstallStatus = $"Invalid package data for {pkg.Name}";
+                return;
+            }
+        }
+
+        _cancellationTokenSource = new CancellationTokenSource();
         IsInstalling = true;
         ProgressValue = 0;
         InstallLog.Clear();
+        InstallStatus = "Starting installation...";
 
-        var completed = 0;
-        foreach (var package in selected)
+        // Subscribe to output events
+        _outputHandler = msg => SafeDispatch(() => InstallLog.Add($"  {msg}"));
+        _errorHandler = msg => SafeDispatch(() => InstallLog.Add($"  [ERR] {msg}"));
+
+        _diagnostics.OutputReceived += _outputHandler;
+        _diagnostics.ErrorReceived += _errorHandler;
+
+        try
         {
-            InstallStatus = $"Installing: {package.Name}...";
-            InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] Starting installation: {package.Name}");
+            var completed = 0;
+            foreach (var package in selected)
+            {
+                if (_cancellationTokenSource.Token.IsCancellationRequested) break;
 
-            _diagnostics.OutputReceived += msg => SafeDispatch(() => InstallLog.Add($"  {msg}"));
-            _diagnostics.ErrorReceived += msg => SafeDispatch(() => InstallLog.Add($"  [ERR] {msg}"));
+                InstallStatus = $"Installing: {package.Name}...";
+                InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] Starting installation: {package.Name}");
 
-            var exitCode = await _diagnostics.RunCommandAsync("cmd", $"/c winget install --id {package.WingetId} {package.SilentArgs} --accept-source-agreements --accept-package-agreements");
-            InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] {package.Name} completed with exit code: {exitCode}");
+                var wingetId = SecurityUtilities.SanitizeArgument(package.WingetId);
+                var silentArgs = SecurityUtilities.SanitizeArgument(package.SilentArgs);
 
-            completed++;
-            ProgressValue = (int)((completed / (double)selected.Count) * 100);
+                var exitCode = await _diagnostics.RunCommandAsync("cmd", $"/c winget install --id {wingetId} {silentArgs} --accept-source-agreements --accept-package-agreements", _cancellationTokenSource.Token);
+                
+                if (_cancellationTokenSource.Token.IsCancellationRequested) break;
+
+                InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] {package.Name} completed with exit code: {exitCode}");
+
+                completed++;
+                ProgressValue = (int)((completed / (double)selected.Count) * 100);
+            }
+
+            if (_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                InstallStatus = "Installation cancelled.";
+            }
+            else
+            {
+                InstallStatus = $"Installation complete. {selected.Count} packages installed.";
+            }
         }
+        catch (OperationCanceledException)
+        {
+            InstallStatus = "Installation cancelled.";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Installation failed");
+            InstallStatus = $"Installation failed: {ex.Message}";
+        }
+        finally
+        {
+            CleanupSubscriptions();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
+            IsInstalling = false;
+        }
+    }
 
-        InstallStatus = $"Installation complete. {completed}/{selected.Count} packages installed.";
-        IsInstalling = false;
+    [RelayCommand]
+    private void CancelInstall()
+    {
+        _cancellationTokenSource?.Cancel();
+        InstallStatus = "Cancelling...";
     }
 
     [RelayCommand]
@@ -125,6 +186,8 @@ public partial class StagingViewModel : ViewModelBase
                 "Disable Lock Screen" => @"reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization"" /v NoLockScreen /t REG_DWORD /d 1 /f",
                 "Show Hidden Files" => @"reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"" /v Hidden /t REG_DWORD /d 1 /f",
                 "Disable AutoPlay" => @"reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"" /v NoDriveTypeAutoRun /t REG_DWORD /d 255 /f",
+                "Disable Windows Defender Sample Submission" => @"reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet"" /v SubmitSamplesConsent /t REG_DWORD /d 0 /f",
+                "Enable Hibernate" => @"powercfg /hibernate on",
                 _ => ""
             };
 
@@ -136,6 +199,20 @@ public partial class StagingViewModel : ViewModelBase
         }
 
         InstallStatus = "Registry tweaks applied.";
+    }
+
+    private void CleanupSubscriptions()
+    {
+        if (_outputHandler != null)
+        {
+            _diagnostics.OutputReceived -= _outputHandler;
+            _outputHandler = null;
+        }
+        if (_errorHandler != null)
+        {
+            _diagnostics.ErrorReceived -= _errorHandler;
+            _errorHandler = null;
+        }
     }
 }
 

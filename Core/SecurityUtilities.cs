@@ -11,6 +11,7 @@ public static class SecurityUtilities
     // Input sanitization for command line arguments
     private static readonly Regex ShellMetaChars = new(@"[;&|`$(){}[\]\\<>'""]", RegexOptions.Compiled);
     private static readonly Regex PathTraversal = new(@"\.\./|\.\.\\", RegexOptions.Compiled);
+    private static readonly Regex ValidArgChars = new(@"^[a-zA-Z0-9._\-/:@\\]*$", RegexOptions.Compiled);
     
     // DPAPI encryption for sensitive data
     public static string Protect(string plainText, DataProtectionScope scope = DataProtectionScope.CurrentUser)
@@ -47,8 +48,22 @@ public static class SecurityUtilities
         // Remove path traversal attempts
         sanitized = PathTraversal.Replace(sanitized, string.Empty);
         
+        // Only allow safe characters
+        if (!ValidArgChars.IsMatch(sanitized))
+        {
+            // Fallback: only keep alphanumeric and safe punctuation
+            var sb = new StringBuilder();
+            foreach (char c in sanitized)
+            {
+                if (char.IsLetterOrDigit(c) || "._-/@\\".Contains(c))
+                    sb.Append(c);
+            }
+            sanitized = sb.ToString();
+        }
+        
         // Trim and limit length
-        return sanitized.Trim().Substring(0, Math.Min(sanitized.Length, 260));
+        sanitized = sanitized.Trim();
+        return sanitized.Length > 260 ? sanitized.Substring(0, 260) : sanitized;
     }
 
     // Sanitize file paths
@@ -65,7 +80,9 @@ public static class SecurityUtilities
             sanitized = sanitized.Replace(c.ToString(), string.Empty);
         }
         
-        return sanitized.Trim().Substring(0, Math.Min(sanitized.Length, 260));
+        sanitized = sanitized.Trim();
+        if (sanitized.Length == 0) return string.Empty;
+        return sanitized.Length > 260 ? sanitized.Substring(0, 260) : sanitized;
     }
 
     // Validate IP address format
@@ -129,5 +146,12 @@ public static class SecurityUtilities
         var bytes = new byte[length];
         rng.GetBytes(bytes);
         return Convert.ToBase64String(bytes);
+    }
+    
+    // Validate that input contains only safe characters for command arguments
+    public static bool IsSafeArgument(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return true;
+        return ValidArgChars.IsMatch(input);
     }
 }

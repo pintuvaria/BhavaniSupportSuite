@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
@@ -30,9 +31,9 @@ public partial class VaultViewModel : ViewModelBase
     {
         new BackupProfile { Name = "User Desktop", Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop), IsSelected = true },
         new BackupProfile { Name = "User Documents", Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), IsSelected = true },
-        new BackupProfile { Name = "User Downloads", Path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads", IsSelected = false },
-        new BackupProfile { Name = "Chrome Bookmarks", Path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Google\\Chrome\\User Data\\Default\\Bookmarks", IsSelected = true },
-        new BackupProfile { Name = "Chrome History", Path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Google\\Chrome\\User Data\\Default\\History", IsSelected = false },
+        new BackupProfile { Name = "User Downloads", Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"), IsSelected = false },
+        new BackupProfile { Name = "Chrome Bookmarks", Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Google", "Chrome", "User Data", "Default", "Bookmarks"), IsSelected = true },
+        new BackupProfile { Name = "Chrome History", Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Google", "Chrome", "User Data", "Default", "History"), IsSelected = false },
         new BackupProfile { Name = "Network Mappings", Path = "HKCU\\Network", IsSelected = true, IsRegistry = true },
     };
 
@@ -83,8 +84,10 @@ public partial class VaultViewModel : ViewModelBase
                 if (profile.IsRegistry)
                 {
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Exporting registry: {profile.Name}");
-                    var regFile = Path.Combine(backupDir, $"{profile.Name.Replace(" ", "_")}.reg");
-                    var exitCode = await RunProcessAsync("reg", $"export \"{profile.Path}\" \"{regFile}\" /y");
+                    var regFile = Path.Combine(backupDir, $"{SanitizeFileName(profile.Name)}.reg");
+                    var sanitizedPath = SecurityUtilities.SanitizeArgument(profile.Path);
+                    var sanitizedRegFile = SecurityUtilities.SanitizePath(regFile);
+                    var exitCode = await RunProcessAsync("reg", $"export \"{sanitizedPath}\" \"{sanitizedRegFile}\" /y");
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Registry export: exit code {exitCode}");
                     
                     if (exitCode == 0 && File.Exists(regFile))
@@ -105,7 +108,7 @@ public partial class VaultViewModel : ViewModelBase
                 else if (File.Exists(profile.Path))
                 {
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Copying file: {profile.Name}");
-                    var destFile = Path.Combine(backupDir, Path.GetFileName(profile.Path));
+                    var destFile = Path.Combine(backupDir, SanitizeFileName(Path.GetFileName(profile.Path)));
                     await Task.Run(() => File.Copy(profile.Path, destFile, true));
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] File copied: {destFile}");
 
@@ -127,7 +130,7 @@ public partial class VaultViewModel : ViewModelBase
                 else if (Directory.Exists(profile.Path))
                 {
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Copying directory: {profile.Name}");
-                    var destDir = Path.Combine(backupDir, profile.Name.Replace(" ", "_"));
+                    var destDir = Path.Combine(backupDir, SanitizeFileName(profile.Name));
                     await Task.Run(() => CopyDirectory(profile.Path, destDir));
                     BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Directory copied: {destDir}");
 
@@ -244,15 +247,91 @@ public partial class VaultViewModel : ViewModelBase
     private async Task RestoreBackupAsync()
     {
         if (IsBusy) return;
+
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Manifest files (*.json)|*.json",
+            Title = "Select backup manifest to restore"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
         IsBusy = true;
-        StatusMessage = "Restore functionality - Select a backup to restore.";
-        BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Restore initiated.");
-        await Task.Delay(100);
-        StatusMessage = "Ready for restore.";
+        StatusMessage = "Restoring backup...";
+        BackupLog.Clear();
+
+        try
+        {
+            var manifestJson = await File.ReadAllTextAsync(dialog.FileName);
+            var manifest = System.Text.Json.JsonSerializer.Deserialize<List<BackupManifestEntry>>(manifestJson) ?? new List<BackupManifestEntry>();
+            var backupDir = Path.GetDirectoryName(dialog.FileName)!;
+            var restoreDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BhavaniRestore", DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+
+            Directory.CreateDirectory(restoreDir);
+            BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Restoring to: {restoreDir}");
+
+            int restored = 0, failed = 0;
+
+            foreach (var entry in manifest)
+            {
+                var sourcePath = Path.Combine(backupDir, Path.GetFileName(entry.BackupPath));
+                
+                if (!File.Exists(sourcePath))
+                {
+                    BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] [MISSING] {entry.Name}");
+                    failed++;
+                    continue;
+                }
+
+                var actualChecksum = SecurityUtilities.ComputeSha256(sourcePath);
+                if (!string.Equals(SecurityUtilities.ComputeSha256(sourcePath), entry.Sha256, StringComparison.OrdinalIgnoreCase))
+                {
+                    BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] [MISMATCH] {entry.Name} - integrity check failed");
+                    failed++;
+                    continue;
+                }
+
+                try
+                {
+                    var destPath = Path.Combine(restoreDir, entry.Name);
+                    Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+                    
+                    if (entry.Type == "Registry")
+                    {
+                        var exitCode = await RunProcessAsync("reg", $"import \"{sourcePath}\"");
+                        BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Restored registry: {entry.Name} (exit: {exitCode})");
+                    }
+                    else
+                    {
+                        var destPath2 = Path.Combine(restoreDir, Path.GetFileName(entry.BackupPath));
+                        Directory.CreateDirectory(Path.GetDirectoryName(destPath2)!);
+                        await Task.Run(() => File.Copy(sourcePath, destPath2, true));
+                        BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Restored file: {entry.Name}");
+                    }
+                    
+                    restored++;
+                }
+                catch (Exception ex)
+                {
+                    BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Failed to restore {entry.Name}: {ex.Message}");
+                    failed++;
+                }
+            }
+
+            BackupLog.Add($"[{DateTime.Now:HH:mm:ss}] Restore complete: {restored} restored, {failed} failed.");
+            StatusMessage = $"Restore complete: {restored} restored, {failed} failed to {restoreDir}";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Restore failed");
+            BackupLog.Add($"Error: {ex.Message}");
+            StatusMessage = "Restore failed: " + ex.Message;
+        }
+
         IsBusy = false;
     }
 
-    private static void CopyDirectory(string source, string destination)
+private static void CopyDirectory(string source, string destination)
     {
         Directory.CreateDirectory(destination);
         foreach (var file in Directory.GetFiles(source))
@@ -261,14 +340,28 @@ public partial class VaultViewModel : ViewModelBase
             CopyDirectory(dir, Path.Combine(destination, Path.GetFileName(dir)));
     }
 
+    private static string SanitizeFileName(string name)
+    {
+        var invalidChars = Path.GetInvalidFileNameChars();
+        var sb = new StringBuilder(name);
+        foreach (var c in invalidChars)
+        {
+            sb.Replace(c, '_');
+        }
+        return sb.ToString();
+    }
+
     private async Task<int> RunProcessAsync(string fileName, string arguments)
     {
+        var sanitizedFile = SecurityUtilities.SanitizePath(fileName);
+        var sanitizedArgs = SecurityUtilities.SanitizeArgument(arguments);
+        
         var process = new System.Diagnostics.Process
         {
             StartInfo = new System.Diagnostics.ProcessStartInfo
             {
-                FileName = fileName, 
-                Arguments = arguments,
+                FileName = sanitizedFile, 
+                Arguments = SecurityUtilities.SanitizeArgument(arguments),
                 UseShellExecute = false, 
                 CreateNoWindow = true,
                 RedirectStandardOutput = true, 

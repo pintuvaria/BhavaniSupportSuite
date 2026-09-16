@@ -3,12 +3,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
 using BhavaniSupportSuite.Services;
+using Serilog;
 
 namespace BhavaniSupportSuite.ViewModels;
 
-public partial class DashboardViewModel : ViewModelBase
+public partial class DashboardViewModel : ViewModelBase, IDisposable
 {
     private readonly DiagnosticsService _diagnostics;
+    private CancellationTokenSource? _telemetryCts;
 
     [ObservableProperty]
     private ObservableCollection<string> _systemInfo = new();
@@ -67,7 +69,7 @@ public partial class DashboardViewModel : ViewModelBase
         Title = "Unified Dashboard";
         _repairStatus = "Ready";
         _ = LoadSystemInfoAsync();
-        _ = StartTelemetryAsync();
+        StartTelemetryAsync();
     }
 
     private async Task LoadSystemInfoAsync()
@@ -86,24 +88,48 @@ public partial class DashboardViewModel : ViewModelBase
         }
 
         try { Domain = System.DirectoryServices.ActiveDirectory.Domain.GetComputerDomain().Name; }
-        catch { Domain = Environment.UserDomainName; }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get domain name");
+            Domain = Environment.UserDomainName;
+        }
     }
 
-    private async Task StartTelemetryAsync()
+    private void StartTelemetryAsync()
     {
-        while (true)
+        _telemetryCts = new CancellationTokenSource();
+        _ = RunTelemetryAsync(_telemetryCts.Token);
+    }
+
+    private async Task RunTelemetryAsync(CancellationToken token)
+    {
+        try
         {
-            try
+            while (!token.IsCancellationRequested)
             {
-                CpuUsage = DiagnosticsService.GetCpuUsage();
-                MemoryUsage = DiagnosticsService.GetMemoryUsage();
-                DiskIO = DiagnosticsService.GetDiskReadBytes() / (1024 * 1024);
-                NetworkThroughput = DiagnosticsService.GetNetworkBytes() / (1024 * 1024);
-                CpuTemperature = DiagnosticsService.GetCpuTemperature();
-                CpuTemperatureF = CpuTemperature * 9f / 5f + 32f;
+                try
+                {
+                    CpuUsage = DiagnosticsService.GetCpuUsage();
+                    MemoryUsage = DiagnosticsService.GetMemoryUsage();
+                    DiskIO = DiagnosticsService.GetDiskReadBytes() / (1024 * 1024);
+                    NetworkThroughput = DiagnosticsService.GetNetworkBytes() / (1024 * 1024);
+                    CpuTemperature = DiagnosticsService.GetCpuTemperature();
+                    CpuTemperatureF = CpuTemperature * 9f / 5f + 32f;
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Failed to update telemetry");
+                }
+                await Task.Delay(2000, token);
             }
-            catch { }
-            await Task.Delay(2000);
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected on disposal
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Telemetry loop failed");
         }
     }
 
@@ -124,20 +150,46 @@ public partial class DashboardViewModel : ViewModelBase
             ("DNS Flush", "ipconfig", "/flushdns")
         };
 
-        foreach (var (name, fileName, args) in steps)
+        // Subscribe to output events
+        var outputHandler = new Action<string>(msg => SafeDispatch(() => RepairLog.Add($"  {msg}")));
+        var errorHandler = new Action<string>(msg => SafeDispatch(() => RepairLog.Add($"  [ERR] {msg}")));
+
+        _diagnostics.OutputReceived += outputHandler;
+        _diagnostics.ErrorReceived += errorHandler;
+
+        try
         {
-            RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] Starting: {name}...");
-            RepairStatus = $"Running: {name}";
+            foreach (var (name, fileName, args) in steps)
+            {
+                RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] Starting: {name}...");
+                RepairStatus = $"Running: {name}";
 
-            _diagnostics.OutputReceived += msg => SafeDispatch(() => RepairLog.Add($"  {msg}"));
-            _diagnostics.ErrorReceived += msg => SafeDispatch(() => RepairLog.Add($"  [ERR] {msg}"));
+                var exitCode = await _diagnostics.RunCommandAsync(fileName, args);
+                RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] {name} completed with exit code: {exitCode}");
+            }
 
-            var exitCode = await _diagnostics.RunCommandAsync(fileName, args);
-            RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] {name} completed with exit code: {exitCode}");
+            RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] All repairs completed.");
+            RepairStatus = "Repairs completed.";
         }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Repair failed");
+            RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] Repair failed: {ex.Message}");
+            RepairStatus = "Repair failed.";
+        }
+        finally
+        {
+            // Unsubscribe from events
+            _diagnostics.OutputReceived -= msg => SafeDispatch(() => RepairLog.Add($"  {msg}"));
+            _diagnostics.ErrorReceived -= msg => SafeDispatch(() => RepairLog.Add($"  [ERR] {msg}"));
+            IsRepairRunning = false;
+            RepairStatus = "Repairs completed.";
+        }
+    }
 
-        RepairLog.Add($"[{DateTime.Now:HH:mm:ss}] All repairs completed.");
-        RepairStatus = "Repairs completed.";
-        IsRepairRunning = false;
+    public override void Dispose()
+    {
+        _telemetryCts?.Cancel();
+        _telemetryCts?.Dispose();
     }
 }

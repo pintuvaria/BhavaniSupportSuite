@@ -108,22 +108,24 @@ public partial class RecoveryViewModel : ViewModelBase
     [RelayCommand]
     private async Task StartServiceAsync(string serviceName)
     {
-        if (string.IsNullOrEmpty(serviceName)) return;
+        if (string.IsNullOrEmpty(serviceName) || !SecurityUtilities.IsSafeArgument(serviceName)) return;
 
         StatusMessage = $"Starting service: {serviceName}...";
-        var exitCode = await _diagnostics.RunCommandCapturedAsync("sc", $"start \"{serviceName}\"");
-        AuditLog.Add($"[{DateTime.Now:HH:mm:ss}] Start {serviceName}: {exitCode}");
+        var sanitizedName = SecurityUtilities.SanitizeArgument(serviceName);
+        var exitCode = await _diagnostics.RunCommandCapturedAsync("sc", $"start \"{sanitizedName}\"");
+        AuditLog.Add($"[{DateTime.Now:HH:mm:ss}] Start {sanitizedName}: {exitCode}");
         await LoadServicesAsync();
     }
 
     [RelayCommand]
     private async Task StopServiceAsync(string serviceName)
     {
-        if (string.IsNullOrEmpty(serviceName)) return;
+        if (string.IsNullOrEmpty(serviceName) || !SecurityUtilities.IsSafeArgument(serviceName)) return;
 
         StatusMessage = $"Stopping service: {serviceName}...";
-        var exitCode = await _diagnostics.RunCommandCapturedAsync("sc", $"stop \"{serviceName}\"");
-        AuditLog.Add($"[{DateTime.Now:HH:mm:ss}] Stop {serviceName}: {exitCode}");
+        var sanitizedName = SecurityUtilities.SanitizeArgument(serviceName);
+        var exitCode = await _diagnostics.RunCommandCapturedAsync("sc", $"stop \"{sanitizedName}\"");
+        AuditLog.Add($"[{DateTime.Now:HH:mm:ss}] Stop {sanitizedName}: {exitCode}");
         await LoadServicesAsync();
     }
 

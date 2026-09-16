@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net;
+using System.Security;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using BhavaniSupportSuite.Core;
 using BhavaniSupportSuite.Services;
+using Serilog;
 
 namespace BhavaniSupportSuite.ViewModels;
 
@@ -24,7 +27,7 @@ public partial class UtilitiesViewModel : ViewModelBase
     private string _targetUsername = string.Empty;
 
     [ObservableProperty]
-    private string _newPassword = string.Empty;
+    private SecureString _newPassword = new();
 
     [ObservableProperty]
     private string _reportPath = string.Empty;
@@ -37,12 +40,25 @@ public partial class UtilitiesViewModel : ViewModelBase
         ReportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
     }
 
+    public string NewPasswordString
+    {
+        get => new System.Net.NetworkCredential(string.Empty, NewPassword).Password;
+        set => NewPassword = value != null ? new System.Net.NetworkCredential(string.Empty, value).SecurePassword : new SecureString();
+    }
+
     [RelayCommand]
     private async Task ResetPasswordAsync()
     {
-        if (string.IsNullOrEmpty(TargetUsername) || string.IsNullOrEmpty(NewPassword))
+        if (string.IsNullOrWhiteSpace(TargetUsername) || NewPassword.Length == 0)
         {
             StatusMessage = "Please enter username and new password.";
+            return;
+        }
+
+        // Validate username format
+        if (!SecurityUtilities.IsSafeArgument(TargetUsername))
+        {
+            StatusMessage = "Invalid username format.";
             return;
         }
 
@@ -50,11 +66,31 @@ public partial class UtilitiesViewModel : ViewModelBase
         StatusMessage = $"Resetting password for: {TargetUsername}...";
         OutputLog.Clear();
 
-        var exitCode = await _diagnostics.RunCommandAsync("net", $"user \"{TargetUsername}\" \"{NewPassword}\"");
-        OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Password reset completed with exit code: {exitCode}");
+        try
+        {
+            // Use PowerShell for secure password handling
+            var passwordString = new System.Net.NetworkCredential(string.Empty, NewPassword).Password;
+            var sanitizedUser = SecurityUtilities.SanitizeArgument(TargetUsername);
+            var sanitizedPass = SecurityUtilities.SanitizeArgument(passwordString);
+            
+            // Use PowerShell with secure string handling
+            var psCommand = $"$user = '{sanitizedUser}'; $pass = ConvertTo-SecureString '{SecurityUtilities.SanitizeArgument(passwordString)}' -AsPlainText -Force; Set-LocalUser -Name $user -Password $pass";
+            
+            var exitCode = await _diagnostics.RunCommandAsync("powershell", $"-Command \"{psCommand}\"");
+            OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Password reset completed with exit code: {exitCode}");
 
-        StatusMessage = exitCode == 0 ? "Password reset successfully." : "Password reset failed.";
-        IsBusy = false;
+            StatusMessage = exitCode == 0 ? "Password reset successfully." : "Password reset failed.";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Password reset failed for user {User}", TargetUsername);
+            OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Error: {ex.Message}");
+            StatusMessage = "Password reset failed.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -64,15 +100,17 @@ public partial class UtilitiesViewModel : ViewModelBase
         StatusMessage = "Generating diagnostic report...";
         OutputLog.Clear();
 
-        var reportFile = Path.Combine(ReportPath, $"BhavaniReport_{DateTime.Now:yyyyMMdd_HHmmss}.html");
-        var hostname = Environment.MachineName;
-        var username = Environment.UserName;
-        var osVersion = Environment.OSVersion.ToString();
-        var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
-        var cpuUsage = DiagnosticsService.GetCpuUsage();
-        var memUsage = DiagnosticsService.GetMemoryUsage();
+        try
+        {
+            var reportFile = Path.Combine(ReportPath, $"BhavaniReport_{DateTime.Now:yyyyMMdd_HHmmss}.html");
+            var hostname = Environment.MachineName;
+            var username = Environment.UserName;
+            var osVersion = Environment.OSVersion.ToString();
+            var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
+            var cpuUsage = DiagnosticsService.GetCpuUsage();
+            var memUsage = DiagnosticsService.GetMemoryUsage();
 
-        var html = $@"<!DOCTYPE html>
+            var html = $@"<!DOCTYPE html>
 <html>
 <head>
     <title>Bhavani Technology - Diagnostic Report</title>
@@ -124,23 +162,30 @@ public partial class UtilitiesViewModel : ViewModelBase
 </body>
 </html>";
 
-        await File.WriteAllTextAsync(reportFile, html);
-        OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Report generated: {reportFile}");
-        StatusMessage = $"Report saved to: {reportFile}";
+            await File.WriteAllTextAsync(reportFile, html);
+            OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Report generated: {reportFile}");
+            StatusMessage = $"Report saved to: {reportFile}";
 
-        try
-        {
-            var process = new System.Diagnostics.Process
+            try
             {
-                StartInfo = new System.Diagnostics.ProcessStartInfo
+                var process = new System.Diagnostics.Process
                 {
-                    FileName = reportFile,
-                    UseShellExecute = true
-                }
-            };
-            process.Start();
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = reportFile,
+                        UseShellExecute = true
+                    }
+                };
+                process.Start();
+            }
+            catch { }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to generate report");
+            OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Error: {ex.Message}");
+            StatusMessage = $"Error: {ex.Message}";
+        }
 
         IsBusy = false;
     }
@@ -152,9 +197,18 @@ public partial class UtilitiesViewModel : ViewModelBase
         StatusMessage = "Listing local users...";
         OutputLog.Clear();
 
-        var output = await _diagnostics.RunCommandCapturedAsync("net", "user");
-        OutputLog.Add(output);
-        StatusMessage = "Local user list loaded.";
+        try
+        {
+            var output = await _diagnostics.RunCommandCapturedAsync("net", "user");
+            OutputLog.Add(output);
+            StatusMessage = "Local user list loaded.";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to list local users");
+            StatusMessage = $"Error: {ex.Message}";
+        }
+
         IsBusy = false;
     }
 
@@ -165,9 +219,18 @@ public partial class UtilitiesViewModel : ViewModelBase
         StatusMessage = "Listing scheduled tasks...";
         OutputLog.Clear();
 
-        var output = await _diagnostics.RunCommandCapturedAsync("schtasks", "/query /fo LIST");
-        OutputLog.Add(output);
-        StatusMessage = "Scheduled tasks loaded.";
+        try
+        {
+            var output = await _diagnostics.RunCommandCapturedAsync("schtasks", "/query /fo LIST");
+            OutputLog.Add(output);
+            StatusMessage = "Scheduled tasks loaded.";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to list scheduled tasks");
+            StatusMessage = $"Error: {ex.Message}";
+        }
+
         IsBusy = false;
     }
 
