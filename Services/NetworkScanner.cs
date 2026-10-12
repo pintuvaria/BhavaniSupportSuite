@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using Serilog;
+using BhavaniSupportSuite.Core;
 
 namespace BhavaniSupportSuite.Services;
 
@@ -277,8 +279,14 @@ public class NetworkScanner
         catch { return "Unknown"; }
     }
 
-    private static async Task<string> GetMacAddressAsync(string ip)
+private static async Task<string> GetMacAddressAsync(string ip)
     {
+        if (!SecurityUtilities.IsValidIpAddress(ip))
+        {
+            Log.Warning("Invalid IP address format: {Ip}", ip);
+            return "N/A";
+        }
+
         try
         {
             if (_arpTable.TryGetValue(ip, out var cached)) return cached;
@@ -286,7 +294,7 @@ public class NetworkScanner
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "arp", Arguments = $"-a {ip}",
+                    FileName = "arp", Arguments = $"-a {SecurityUtilities.SanitizeArgument(ip)}",
                     UseShellExecute = false, RedirectStandardOutput = true, CreateNoWindow = true
                 }
             };
@@ -303,7 +311,10 @@ public class NetworkScanner
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get MAC address for IP: {Ip}", ip);
+        }
         return "N/A";
     }
 

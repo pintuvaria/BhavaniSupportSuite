@@ -1,5 +1,6 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Serilog;
 
 namespace BhavaniSupportSuite.Core;
 
@@ -27,17 +28,17 @@ public abstract class ViewModelBase : ObservableObject
             if (Application.Current?.Dispatcher == null) return;
             if (Application.Current.Dispatcher.CheckAccess())
             {
-                try { action(); } catch { }
+                try { action(); } catch (Exception ex) { Log.Error(ex, "SafeDispatch UI thread action failed"); }
             }
             else
             {
                 Application.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    try { action(); } catch { }
+                    try { action(); } catch (Exception ex) { Log.Error(ex, "SafeDispatch background thread action failed"); }
                 });
             }
         }
-        catch { }
+        catch (Exception ex) { Log.Error(ex, "SafeDispatch failed"); }
     }
 
     public virtual void Dispose() { }

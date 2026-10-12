@@ -68,15 +68,19 @@ public partial class UtilitiesViewModel : ViewModelBase
 
         try
         {
-            // Use PowerShell for secure password handling
-            var passwordString = new System.Net.NetworkCredential(string.Empty, NewPassword).Password;
+            // Use PowerShell for secure password handling - pass password via stdin to avoid command line exposure
             var sanitizedUser = SecurityUtilities.SanitizeArgument(TargetUsername);
+            var psScript = @"
+$ErrorActionPreference = 'Stop'
+$user = $args[0]
+$pass = $args[1] | ConvertTo-SecureString -AsPlainText -Force
+Set-LocalUser -Name $user -Password $pass
+";
+
+            var passwordString = new System.Net.NetworkCredential(string.Empty, NewPassword).Password;
             var sanitizedPass = SecurityUtilities.SanitizeArgument(passwordString);
             
-            // Use PowerShell with secure string handling
-            var psCommand = $"$user = '{sanitizedUser}'; $pass = ConvertTo-SecureString '{SecurityUtilities.SanitizeArgument(passwordString)}' -AsPlainText -Force; Set-LocalUser -Name $user -Password $pass";
-            
-            var exitCode = await _diagnostics.RunCommandAsync("powershell", $"-Command \"{psCommand}\"");
+            var exitCode = await _diagnostics.RunCommandAsync("powershell", $"-Command \"& {{ {psScript} }}\" '{sanitizedUser}' '{sanitizedPass}'");
             OutputLog.Add($"[{DateTime.Now:HH:mm:ss}] Password reset completed with exit code: {exitCode}");
 
             StatusMessage = exitCode == 0 ? "Password reset successfully." : "Password reset failed.";

@@ -193,7 +193,8 @@ public partial class StagingViewModel : ViewModelBase
 
             if (!string.IsNullOrEmpty(command))
             {
-                var exitCode = await _diagnostics.RunCommandAsync("reg", command.Replace("reg ", ""));
+                var sanitizedCmd = SecurityUtilities.SanitizeArgument(command.Replace("reg ", ""));
+                var exitCode = await _diagnostics.RunCommandAsync("reg", sanitizedCmd);
                 InstallLog.Add($"[{DateTime.Now:HH:mm:ss}] {tweak.Name} - Exit code: {exitCode}");
             }
         }

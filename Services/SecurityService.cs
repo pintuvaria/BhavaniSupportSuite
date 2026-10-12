@@ -1,7 +1,10 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Management;
 using Microsoft.Win32;
+using System.Security.Cryptography.X509Certificates;
+using Serilog;
 
 namespace BhavaniSupportSuite.Services;
 
@@ -45,7 +48,8 @@ public class SecurityService
                 {
                     var memMb = proc.WorkingSet64 / (1024 * 1024);
                     var filePath = string.Empty;
-                    try { filePath = proc.MainModule?.FileName ?? string.Empty; } catch { }
+                    try { filePath = proc.MainModule?.FileName ?? string.Empty; }
+                    catch (Exception ex) { Log.Warning(ex, "Failed to get file path for process {Pid}", proc.Id); }
 
                     processes.Add(new ProcessInfo
                     {
@@ -56,10 +60,10 @@ public class SecurityService
                         Status = "Running"
                     });
                 }
-                catch { }
+                catch (Exception ex) { Log.Warning(ex, "Failed to process process {Pid}", proc.Id); }
             }
         }
-        catch { }
+        catch (Exception ex) { Log.Error(ex, "Failed to retrieve running processes"); }
         return processes.OrderByDescending(p => p.MemoryMb).ToList();
     }
 
@@ -89,7 +93,10 @@ public class SecurityService
                             IsEnabled = true
                         });
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to read registry key: {KeyPath}", keyPath);
+            }
         }
 
         try
@@ -105,7 +112,10 @@ public class SecurityService
                         IsEnabled = true
                     });
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to read HKCU Run key");
+        }
 
         try
         {
@@ -122,7 +132,10 @@ public class SecurityService
                     });
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to read startup folder");
+        }
 
         return await Task.FromResult(items);
     }
@@ -166,7 +179,10 @@ public class SecurityService
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to retrieve scheduled tasks");
+        }
         return tasks;
     }
 
@@ -190,7 +206,10 @@ public class SecurityService
             process.WaitForExit();
             return output.Contains("Protection Status: Protection On");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get BitLocker status");
+        }
         return false;
     }
 
@@ -206,7 +225,10 @@ public class SecurityService
                     return Convert.ToInt32(value) == 3;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get USB storage status");
+        }
         return true;
     }
 
@@ -217,7 +239,10 @@ public class SecurityService
             using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\USBSTOR", true);
             key?.SetValue("Start", enabled ? 3 : 4, RegistryValueKind.DWord);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to set USB storage enabled state: {Enabled}", enabled);
+        }
     }
 
     public static Task<string> KillProcessAsync(int processId)
@@ -251,16 +276,40 @@ public class SecurityService
                             var cert = System.Security.Cryptography.X509Certificates.X509Certificate.CreateFromSignedFile(path);
                             _ = cert;
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            Log.Warning(ex, "Failed to check signature for process {Pid}: {ProcessName}", proc.Id, proc.ProcessName);
                             unsigned.Add($"{proc.ProcessName} ({path})");
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Failed to check signature for process {Pid}: {ProcessName}", proc.Id, proc.ProcessName);
+                }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to retrieve unsigned binaries");
+        }
         return unsigned.Distinct().ToList();
+    }
+
+    public static List<string> GetUsbStorageDevices()
+    {
+        var devices = new List<string>();
+        try
+        {
+            using var searcher = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_USBHub");
+            foreach (var obj in searcher.Get())
+                devices.Add($"{obj["DeviceID"]} - {obj["Name"]}");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to enumerate USB devices");
+            devices.Add("Unable to enumerate USB devices.");
+        }
+        return devices;
     }
 }

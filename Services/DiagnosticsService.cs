@@ -192,21 +192,35 @@ public class DiagnosticsService
     {
         try
         {
-            using var c = new PerformanceCounter("Network Interface", "Bytes Total/sec", "Realtek PCIe GbE Family Controller");
-            return c.NextValue();
-        }
-        catch
-        {
-            try
+            // Try to get the first non-loopback network interface dynamically
+            foreach (var nic in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
             {
-                foreach (var nic in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
-                    if (nic.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
-                        nic.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
-                        return nic.GetIPv4Statistics().BytesSent + nic.GetIPv4Statistics().BytesReceived;
+                if (nic.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
+                    nic.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
+                {
+                    using var c = new PerformanceCounter("Network Interface", "Bytes Total/sec", nic.Name);
+                    return c.NextValue();
+                }
             }
-            catch { }
-            return 0f;
         }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get network bytes via PerformanceCounter");
+        }
+        try
+        {
+            foreach (var nic in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (nic.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up &&
+                    nic.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback)
+                    return nic.GetIPv4Statistics().BytesSent + nic.GetIPv4Statistics().BytesReceived;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to get network bytes via NetworkInterface");
+        }
+        return 0f;
     }
 
     public static float GetCpuTemperature()
