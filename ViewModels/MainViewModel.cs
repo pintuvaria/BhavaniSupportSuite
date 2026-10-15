@@ -58,7 +58,9 @@ public partial class MainViewModel : ViewModelBase
         new NavItem { Icon = "\uE74E", Label = "Storage", ViewName = "Storage" },
         new NavItem { Icon = "\uE774", Label = "Reports", ViewName = "Reports" },
         new NavItem { Icon = "\uE74E", Label = "Recovery", ViewName = "Recovery" },
-        new NavItem { Icon = "\uE774", Label = "Utilities", ViewName = "Utilities" }
+        new NavItem { Icon = "\uE774", Label = "Utilities", ViewName = "Utilities" },
+        new NavItem { Icon = "\uE777", Label = "Patches", ViewName = "Patches" },
+        new NavItem { Icon = "\uE8D1", Label = "Software", ViewName = "Software" }
     };
 
     public DashboardViewModel DashboardVM { get; }
@@ -71,6 +73,8 @@ public partial class MainViewModel : ViewModelBase
     public ReportsViewModel ReportsVM { get; }
     public RecoveryViewModel RecoveryVM { get; }
     public UtilitiesViewModel UtilitiesVM { get; }
+    public PatchViewModel PatchVM { get; }
+    public SoftwareInventoryViewModel SoftwareVM { get; }
 
     public static IValueConverter SidebarWidthConverter { get; } = new SidebarWidthValueConverter();
     public static IValueConverter SidebarToggleConverter { get; } = new SidebarToggleValueConverter();
@@ -87,7 +91,9 @@ public partial class MainViewModel : ViewModelBase
         StorageViewModel storageVM,
         ReportsViewModel reportsVM,
         RecoveryViewModel recoveryVM,
-        UtilitiesViewModel utilitiesVM)
+        UtilitiesViewModel utilitiesVM,
+        PatchViewModel patchVM,
+        SoftwareInventoryViewModel softwareVM)
     {
         _diagnosticsService = diagnosticsService;
         _networkScanner = networkScanner;
@@ -101,6 +107,8 @@ public partial class MainViewModel : ViewModelBase
         ReportsVM = reportsVM;
         RecoveryVM = recoveryVM;
         UtilitiesVM = utilitiesVM;
+        PatchVM = patchVM;
+        SoftwareVM = softwareVM;
 
         _currentView = DashboardVM;
         _selectedNavItem = "Dashboard";
@@ -138,6 +146,8 @@ public partial class MainViewModel : ViewModelBase
                 "Reports" => ReportsVM,
                 "Recovery" => RecoveryVM,
                 "Utilities" => UtilitiesVM,
+                "Patches" => PatchVM,
+                "Software" => SoftwareVM,
                 _ => DashboardVM
             };
             SelectedNavItem = viewName;

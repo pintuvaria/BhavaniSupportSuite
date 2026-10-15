@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SecurityService>();
         services.AddSingleton<StorageService>();
         services.AddSingleton<ReportsService>();
+        services.AddSingleton<PatchService>();
+        services.AddSingleton<SoftwareInventoryService>();
 
         // ViewModels
         services.AddTransient<DashboardViewModel>();
@@ -33,6 +35,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ReportsViewModel>();
         services.AddTransient<RecoveryViewModel>();
         services.AddTransient<UtilitiesViewModel>();
+        services.AddTransient<PatchViewModel>();
+        services.AddTransient<SoftwareInventoryViewModel>();
         services.AddTransient<MainViewModel>();
 
         // Views
@@ -46,6 +50,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ReportsView>();
         services.AddTransient<RecoveryView>();
         services.AddTransient<UtilitiesView>();
+        services.AddTransient<PatchView>();
+        services.AddTransient<SoftwareInventoryView>();
 
         return services;
     }
